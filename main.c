@@ -1,7 +1,7 @@
 #include "headers.h"
 //TESTING
 //TESTING2
-//my edit
+//my edits
 
 int main( int argc, char* argv[]){
 
