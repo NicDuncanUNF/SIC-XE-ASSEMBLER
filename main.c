@@ -108,7 +108,7 @@ int main( int argc, char* argv[]){
 					startFound = 1;
 					thirdToken = strtok(NULL, " \r\t\n");
 					//error check 5
-					int maxMem = strtol("8000", NULL, 16);
+					int maxMem = strtol("100000", NULL, 16);
 					if(strtol(thirdToken, NULL, 16) >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, SIC program starts outside of memory.\n\n", fullline, lineNum);
 						fclose(fp);
@@ -136,7 +136,7 @@ int main( int argc, char* argv[]){
 					loArr[loEle] = loCounter;
                                         loEle++;
 					//check test 10 after every usage of  update location
-					int maxMem = strtol("8000", NULL, 16);
+					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                                 fclose(fp);
@@ -160,7 +160,7 @@ int main( int argc, char* argv[]){
 				loCounter = updateLocation(NULL, NULL, loCounter, fullline, lineNum);
 				loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+				int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
@@ -197,7 +197,7 @@ int main( int argc, char* argv[]){
 				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
                         	loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+				int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
@@ -211,7 +211,7 @@ int main( int argc, char* argv[]){
 				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
 				loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+				int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
