@@ -1,4 +1,4 @@
-project2:	main.o symbols.o  directives.o instructions.o headers.h
+project4:	main.o symbols.o  directives.o instructions.o headers.h
 	gcc -o project2 -Wall  -O0 main.o symbols.o directives.o instructions.o
 
 main.o:	main.c headers.h
