@@ -1,6 +1,6 @@
 #include "headers.h"
 
-
+//checks if the input is a valid system directive
 int IsADirective( char *Test ){
 
 return		( 	! ( 

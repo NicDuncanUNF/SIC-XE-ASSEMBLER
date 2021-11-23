@@ -769,20 +769,7 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 
 }
 
-void addSymbol(struct symbol* Tab[], int addr, int src, char* symName){
 
-	int index;
-	index = 0;
-	struct symbol* newSym;
-	newSym = malloc(sizeof(struct symbol));
-	newSym->Address = addr, newSym->DefinedOnSourceLine = src, strcpy(newSym->Name, symName);
-	while(Tab[index] != NULL){
-        	index++;
-	}
-	Tab[index] = newSym;
-	//printf("%s\t%X\n",Tab[index]->Name,Tab[index]->Address);
-
-}
 //returns zero or non zero//
 int symbolExists(struct symbol* Tab[], char* sName){
 	//printf("Symbol exists entered \n\n");
@@ -804,66 +791,6 @@ int symbolExists(struct symbol* Tab[], char* sName){
 	return result;
 }
 
-char getOpcode(char* nem){
 
-        if(strcmp( nem, "ADD") == 0){
-                return 0x18;
-        }
-        else if(strcmp( nem, "AND") == 0){
-                return 0x40;
-        }else if(strcmp( nem, "COMP") == 0){
-                return 0x28;
-        }else if(strcmp( nem, "DIV") == 0){
-                return 0x24;
-        }else if(strcmp( nem, "J") == 0){
-                return 0x3C;
-        }else if(strcmp( nem, "JEQ") == 0){
-                return 0x30;
-        }else if(strcmp( nem, "JGT") == 0){
-                return 0x34;
-        }else if(strcmp( nem, "JLT") == 0){
-                return 0x38;
-        }else if(strcmp( nem, "JSUB") == 0){
-                return 0x48;
-        }else if(strcmp( nem, "LDA") == 0){
-                return 0x00;
-        }else if(strcmp( nem, "LDCH") == 0){
-                return 0x50;
-        }else if(strcmp( nem, "LDL") == 0){
-                return 0x08;
-        }else if(strcmp( nem, "LDX") == 0){
-                return 0x04;
-        }else if(strcmp( nem, "MUL") == 0){
-                return 0x20;
-        }else if(strcmp( nem, "OR") == 0){
-                return 0x44;
-        }else if(strcmp( nem, "RD") == 0){
-                return 0xD8;
-        }else if(strcmp( nem, "RSUB") == 0){
-                return 0x4C;
-        }else if(strcmp( nem, "STA") == 0){
-                return 0x0C;
-        }else if(strcmp( nem, "STCH") == 0){
-                return 0x54;
-        }else if(strcmp( nem, "STL") == 0){
-                return 0x14;
-        }else if(strcmp( nem, "STSW") == 0){
-                return 0xE8;
-        }else if(strcmp( nem, "STX") == 0){
-                return 0x10;
-        }else if(strcmp( nem, "SUB") == 0){
-                return 0x1C;
-        }else if(strcmp( nem, "TD") == 0){
-                return 0xE0;
-        }else if(strcmp( nem, "TIX") == 0){
-                return 0x2C;
-        }else if(strcmp( nem, "WD") == 0){
-                return 0xDC;
-        }else{
-                printf("\nunrecognized instruction found\n\n%s\n\n",nem);
-		return 0;
-       }
-
-}
 
 
