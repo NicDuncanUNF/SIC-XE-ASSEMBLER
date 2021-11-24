@@ -1,7 +1,7 @@
 #include "headers.h"
-//TESTING
-//TESTING2
-//my edd
+//Preprocessor variables
+//maximum PC reach in pass 2 is about 2100 bytes, document and/or find true number
+#define MAX_PC_REACH 2100
 
 int main( int argc, char* argv[]){
 
@@ -18,7 +18,7 @@ int main( int argc, char* argv[]){
 	int lineNum = 0;
 	//used in pass 2 to indicate a START directive have been used
 	int startFound = 0;
-	//
+	//an array that holds location addresses from every line
 	int loArr[1024];
 	//
 	int loEle = 0;
@@ -142,39 +142,39 @@ int main( int argc, char* argv[]){
 					addSymbol(SymbolTable, loCounter, lineNum, newsym);
 					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
 					loArr[loEle] = loCounter;
-                                        loEle++;
+                    loEle++;
 					//check test 10 after every usage of  update location
 					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                                 fclose(fp);
                                                 return 0;
-					}
+					}//end if
 
-				}
+				}//end else
 
-			}
+			}//end if
 			//if new sym and instruction
 			else if(IsAnInstruction(nextoken) == 1){
 				//printf("%s is a valid instruction.\n\n", nextoken);
 				//move location counter by 3bytes
 				if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
-                                                printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
-                                                fclose(fp);
-                                                return 0;
-                                }
+					printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
+                    fclose(fp);
+                    return 0;
+                }//end if
 				addSymbol(SymbolTable, loCounter, lineNum, newsym);
 				//error check 10
-				loCounter = updateLocation(NULL, NULL, loCounter, fullline, lineNum);
+				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
 				loArr[loEle] = loCounter;
-                                loEle++;
+                loEle++;
 				int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-			}
+                                }//end if
+			}//end elseif
 			//if none of the above are triggered, the middle token is an invalid directice or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
@@ -676,11 +676,32 @@ int main( int argc, char* argv[]){
 //edit this to feed line and line number into parameters for error messages
 int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber){
 	//if else for directives that move locounter somewhere other than 3 bytes
-        if(tokThird == NULL){
-                //if instruction, move locounter 3 bytes
-                currCount = currCount + 3;
+        //instruction movement calculation based on format
+		if(IsAnInstruction(dirInst) != 0){
+                //different formats move their respective number in bytes
+				//if format 4
+				if(getInstrMovement(tokThird) == 4){
+					return 4;
+				}//end if
+				//if format 3
+				elseif(getInstrMovement(tokThird) == 3){
+					return 3;
+				}//end if
+				//if format 2
+				elseif(getInstrMovement(tokThird) == 2){
+					return 2;
+				}//end if
+				//if format 1
+				elseif(getInstrMovement(tokThird) == 1){
+					return 1;
+				}//end if
+				
+				else{
+					
+				}//end if
+				
                 return currCount;
-        }
+        }//end if
 	else if(strcmp(dirInst, "BYTE") == 0){
 		//parse string for c string(move loCounter stringlength) for x(move loCounter 1 for each pair)
 		//5,4,2,10 easiest checks according to fred
@@ -779,26 +800,43 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 }
 
 
-//returns zero or non zero//
-int symbolExists(struct symbol* Tab[], char* sName){
-	//printf("Symbol exists entered \n\n");
-	int result = 0;
-	int index = 0;
-	while(Tab[index] != NULL){
-        	if(strcmp(sName, Tab[index]->Name) == 0){
-                	result = -1;
-			//printf("Dup found in symbol exists\n");
-                	break;
-        	}//end if
-		else{
-			//printf("\nSymbol exists else entered %d times\n",index);
-        		index++;
-			continue;
-		}
-	}//end while
 
-	return result;
-}
+
+
+//removes the addressing identifyer from a provided instruction or operand
+//key symbols are:
+//@ - Indirect addressing - operand bound - esentially a pointer
+//# - Immidiate addressing -  operand bound - ?
+//+ - Name? - instruction bound - causes a format 3 instruction to be a format 4
+//Be sure to check in main if the result is valid for it's repsective format
+char chopPrefix(char* chop){
+	
+	//temporary variable to store the result
+	char temp[7];
+	//if the prefix is a @
+	if(chop[0] == '@'){
+		//use the @ as a delimiter
+		temp = strtok(chop, '@');
+	}//end if
+	
+	//if the prefix is a #
+	elseif(chop[0] == '#'){
+		//use the @ as a delimiter
+		temp = strtok(chop, '#');
+	}//end if
+	
+	//if the prefix is a +
+	elseif(chop[0] == '+'){
+		//use the + as a delimiter
+		temp = strtok(chop, '+');
+	}//end if
+	
+	//printf("\n Newly chopped token is: %s", temp);
+	//return the newly choped up string
+	return temp;
+	
+}//end function
+
 
 
 

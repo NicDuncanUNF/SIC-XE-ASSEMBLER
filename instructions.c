@@ -85,7 +85,7 @@ int getInstrMovement(char* Instr){
 	
 	//format 3, a default SIC compatible instruction
 	//these formats are used as a bridge between SIC and SIC XE
-	//42 Different format 3 or 4 instructions
+	//42 Different format 3 instructions
 	if(strcmp( Instr, "ADD") == 0 || strcmp( Instr, "ADDF") == 0 || strcmp( Instr, "AND") == 0 || strcmp( Instr, "COMP") == 0 || strcmp( Instr, "COMPF") == 0 || strcmp( Instr, "DIV") == 0 || strcmp( Instr, "DIVF") == 0 || 
 	strcmp( Instr, "J") == 0 || strcmp( Instr, "JEQ") == 0 || strcmp( Instr, "JGT") == 0 || strcmp( Instr, "JLT") == 0 || strcmp( Instr, "JSUB") == 0 || strcmp( Instr, "LDA") == 0 || strcmp( Instr, "LDB") == 0 || 
 	strcmp( Instr, "LDCH") == 0 || strcmp( Instr, "LDF") == 0 || strcmp( Instr, "LDL") == 0 || strcmp( Instr, "LDS") == 0 || strcmp( Instr, "LDT") == 0 || strcmp( Instr, "LDX") == 0 || strcmp( Instr, "LPS") == 0 || 
@@ -97,6 +97,7 @@ int getInstrMovement(char* Instr){
 	
 	//format 2
 	//11 Different format 2 instructions
+	//these instructions perform basic modifications of registers
 	if(strcmp( Instr, "ADDR") == 0 || strcmp( Instr, "CLEAR") == 0 || strcmp( Instr, "COMPR") == 0 || strcmp( Instr, "DIVR") == 0 || strcmp( Instr, "MULR") == 0 || strcmp( Instr, "RMO") == 0 || strcmp( Instr, "SHIFTL") == 0 || 
 	strcmp( Instr, "SHIFTR") == 0 || strcmp( Instr, "SUBR") == 0 || strcmp( Instr, "SVC") == 0 || strcmp( Instr, "TIXR") == 0)
 		return 2;
@@ -104,6 +105,7 @@ int getInstrMovement(char* Instr){
 	
 	//format 1
 	//6 Different format 1 instructions
+	//Do not do anything with registers or arithmetic
 	if(strcmp( Instr, "FIX") == 0 || strcmp( Instr, "FLOAT") == 0 || strcmp( Instr, "HIO") == 0 || strcmp( Instr, "NORM") == 0 || strcmp( Instr, "SIO") == 0 || strcmp( Instr, "TIO") == 0){
 		return 1;
 	}//end if

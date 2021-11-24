@@ -27,6 +27,28 @@ int IsAValidSymbol( char *TestSymbol ){
 	return Result;
 }//end function
 
+//returns a -1 if the symbol already exists in the symbol table
+//returns a 0 if it doesent exist already
+int symbolExists(struct symbol* Tab[], char* sName){
+	//printf("Symbol exists entered \n\n");
+	int result = 0;
+	int index = 0;
+	while(Tab[index] != NULL){
+        	if(strcmp(sName, Tab[index]->Name) == 0){
+                	result = -1;
+			//printf("Dup found in symbol exists\n");
+                	break;
+        	}//end if
+		else{
+			//printf("\nSymbol exists else entered %d times\n",index);
+        		index++;
+			continue;
+		}//end else
+	}//end while
+
+	return result;
+}
+
 //function for adding a symbol to a function table
 void addSymbol(struct symbol* Tab[], int addr, int src, char* symName){
 
