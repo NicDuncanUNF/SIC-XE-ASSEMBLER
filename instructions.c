@@ -78,12 +78,12 @@ char getOpcode(char* Instr){
 //TODO determine +'s impact on
 int getInstrMovement(char* Instr){
 	//+ in the front means the PC will move 4 no matter what
-	//TODO
+	//Must be a format 3 instruction as well
 	if(Instr[0] == '+'){
 		return 4;
 	}//end if
 	
-	//format 3 or 4, a default SIC compatible instruction
+	//format 3, a default SIC compatible instruction
 	//these formats are used as a bridge between SIC and SIC XE
 	//42 Different format 3 or 4 instructions
 	if(strcmp( Instr, "ADD") == 0 || strcmp( Instr, "ADDF") == 0 || strcmp( Instr, "AND") == 0 || strcmp( Instr, "COMP") == 0 || strcmp( Instr, "COMPF") == 0 || strcmp( Instr, "DIV") == 0 || strcmp( Instr, "DIVF") == 0 || 

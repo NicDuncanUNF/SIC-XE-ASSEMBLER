@@ -10,11 +10,17 @@ int main( int argc, char* argv[]){
 	//char* newsym;
 	//char* nextoken;
 	//char* thirdToken;
+	//holds the current line
 	char fullline[1024];
+	
 	int loCounter;
+	//holds the current line we are on in the file
 	int lineNum = 0;
+	//used in pass 2 to indicate a START directive have been used
 	int startFound = 0;
+	//
 	int loArr[1024];
+	//
 	int loEle = 0;
 
 	if ( argc != 2 ) {
@@ -38,7 +44,7 @@ int main( int argc, char* argv[]){
 	memset( thirdToken, '\0', 1024 * sizeof(char) );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
 
-
+	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
 		strcpy( fullline, line );
@@ -48,15 +54,15 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}
-
+		//
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
-
-			//printf("b4 first strtok\n");
-			newsym = strtok( line, " \r\t\n");
-			//printf("FULL LINE:%s", fullline );
-			//printf("NEW SYMBOL : %s\n",newsym);
+			
+			//increment the current line we are reading on the file
 			lineNum++;
-			//error check test 4
+			//get the symbol 
+			newsym = strtok( line, " \r\t\n");
+			
+			//check if the symbol is a system directive
 			if(IsADirective(newsym) == 1){
 				printf("\nERROR:\n\n%s\nLine %d, Symbol with a directive name.\n\n", fullline, lineNum);
 				fclose(fp);
@@ -87,19 +93,21 @@ int main( int argc, char* argv[]){
 					newsym[i] == 41 ||//)
 					newsym[i] == 64 ||//@
 					newsym[i] == 37){//%
-						printf("\nERROR:\n\n%s\nLine %d, Invalid symbol found.\n\n", fullline, lineNum);
+						printf("\nERROR:\n\n%s\nLine %d, Invalid character used in symbol.\n\n", fullline, lineNum);
                                                 fclose(fp);
                                                 return 0;
-					}
+					}//enf if
 					else{
 						continue;
-					}
-				}
-			}
-
+					}//end else
+				}//end for
+			}//end else
+			
+			//Get the instruction/directive from the line
 			nextoken = strtok( NULL, " \t\n"  );
-			//printf("NEXT TOKEN ON LINE IS %s\n", nextoken );
-			//if new sym and directive
+			
+			//If the middle token is a directive
+			//TODO investigate if directives have any new changes in SICXE
 			if(IsADirective(nextoken) == 1){
 				//printf("%s is a valid directive.\n\n", nextoken);
 				//if else branch of directives for location counter movement
@@ -167,24 +175,25 @@ int main( int argc, char* argv[]){
                                         return 0;
                                 }
 			}
+			//if none of the above are triggered, the middle token is an invalid directice or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
 					printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
                                 	fclose(fp);
                                 	return 0;
-				}
+				}//end if
 				else{
 					printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-				}
-			}
+				}//end else
+			}//end else
 
 
 			continue;
-		}
-		//try and condense this
-		//printf("b4 second if\n");
+		}//end if
+		
+		//if the 
 		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
 			lineNum++;
 			nextoken = strtok( line, " \t\n"  );
@@ -193,52 +202,52 @@ int main( int argc, char* argv[]){
 			if(IsADirective(nextoken) == 1){
                                 //printf("%s is a valid directive.\n\n", nextoken);
                                 //if else branch of directives for location counter movement
-				//error check 10
-				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-                        	loArr[loEle] = loCounter;
+								//error check 10
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+								loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("100000", NULL, 16);
+								int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-			}
+                                }//end if
+			}//end if
                         else if(IsAnInstruction(nextoken) == 1){
                                 //printf("%s is a valid instruction.\n\n", nextoken);
                                 //move location counter by 3bytes
-				//error check 10
-				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-				loArr[loEle] = loCounter;
+								//error check 10
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+								loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("100000", NULL, 16);
+								int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
                                 }
-                        }
+                        }//end else if
                         else{
                                 if(IsADirective(nextoken) == 0){
-					printf("%s",nextoken);
+										printf("%s",nextoken);
                                         printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
+                                }//end if =
                                 else{
                                         printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-                        }
+                                }//end else
+                        }//end else
 			continue;
-		}
-		//edit this to if else and add more specifics i.e line[0] == \n || \r
+		}//end else if
+		//if the line is blank, error out
 		else if(line[0] == '\n' || line[0] == '\r' || line[0] == '\t'){
 			printf("\nERROR:\n\n%s\nLine %d, Blank line found.\n\n", fullline, lineNum+1);
 			fclose(fp);
 			return 0;
-		}
+		}//end else if
 
 
 
