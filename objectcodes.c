@@ -1,13 +1,11 @@
 //will be used for generating objectcodes for format 2, 3, and 4 for TRecords
-//Will update with code later
-//
 #include "headers.h"
 #include "stdlib.h"
 
 char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue)//function will handle formats 1, 2, 3, and 4 for sic xe
 {
-    char * hexToBin(char value); //will remove
-    char binToHex(char *bin);//will remove
+    //char * hexToBin(char value); //will remove
+    //char binToHex(char *bin);//will remove
 
     char buff[1024];
     if(token == NULL) //format 1
