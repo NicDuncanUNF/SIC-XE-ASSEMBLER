@@ -71,7 +71,25 @@ char getOpcode(char* Instr){
 
 
 //TODO find IsAnInstruction function and place here
-
+//returns 1 if the input is an instruction and 0 if it isnt
+int IsAnInstruction (char* Instr){
+	if(strcmp( Instr, "ADD") == 0 || strcmp( Instr, "ADDF") == 0 || strcmp( Instr, "AND") == 0 || strcmp( Instr, "COMP") == 0 || strcmp( Instr, "COMPF") == 0 || strcmp( Instr, "DIV") == 0 || strcmp( Instr, "DIVF") == 0 || 
+	strcmp( Instr, "J") == 0 || strcmp( Instr, "JEQ") == 0 || strcmp( Instr, "JGT") == 0 || strcmp( Instr, "JLT") == 0 || strcmp( Instr, "JSUB") == 0 || strcmp( Instr, "LDA") == 0 || strcmp( Instr, "LDB") == 0 || 
+	strcmp( Instr, "LDCH") == 0 || strcmp( Instr, "LDF") == 0 || strcmp( Instr, "LDL") == 0 || strcmp( Instr, "LDS") == 0 || strcmp( Instr, "LDT") == 0 || strcmp( Instr, "LDX") == 0 || strcmp( Instr, "LPS") == 0 || 
+	strcmp( Instr, "MUL") == 0 || strcmp( Instr, "MULF") == 0 || strcmp( Instr, "OR") == 0 || strcmp( Instr, "RD") == 0 || strcmp( Instr, "RSUB") == 0 || strcmp( Instr, "SSK") == 0 || strcmp( Instr, "STA") == 0 || 
+	strcmp( Instr, "STB") == 0 || strcmp( Instr, "STCH") == 0 || strcmp( Instr, "STF") == 0 || strcmp( Instr, "STI") == 0 || strcmp( Instr, "STL") == 0 || strcmp( Instr, "STS") == 0 || strcmp( Instr, "STSW") == 0 || 
+	strcmp( Instr, "STT") == 0 || strcmp( Instr, "STX") == 0 || strcmp( Instr, "SUB") == 0 || strcmp( Instr, "SUBF") == 0 || strcmp( Instr, "TD") == 0 || strcmp( Instr, "TIX") == 0 || strcmp( Instr, "WD") == 0) || 
+	strcmp( Instr, "ADDR") == 0 || strcmp( Instr, "CLEAR") == 0 || strcmp( Instr, "COMPR") == 0 || strcmp( Instr, "DIVR") == 0 || strcmp( Instr, "MULR") == 0 || strcmp( Instr, "RMO") == 0 || strcmp( Instr, "SHIFTL") == 0 || 
+	strcmp( Instr, "SHIFTR") == 0 || strcmp( Instr, "SUBR") == 0 || strcmp( Instr, "SVC") == 0 || strcmp( Instr, "TIXR") == 0 || strcmp( Instr, "FIX") == 0 || strcmp( Instr, "FLOAT") == 0 || strcmp( Instr, "HIO") == 0 || 
+	strcmp( Instr, "NORM") == 0 || strcmp( Instr, "SIO") == 0 || strcmp( Instr, "TIO") == 0){
+		return 1;
+	}//end if
+	//else
+	else{
+		return 0;
+	}//end else
+	
+}//end function
 
 //function for getting the equavalent PC movement for SIC XE instruction format
 //Can also be used to prove an instruction is not valid
@@ -91,7 +109,7 @@ int getInstrMovement(char* Instr){
 	strcmp( Instr, "LDCH") == 0 || strcmp( Instr, "LDF") == 0 || strcmp( Instr, "LDL") == 0 || strcmp( Instr, "LDS") == 0 || strcmp( Instr, "LDT") == 0 || strcmp( Instr, "LDX") == 0 || strcmp( Instr, "LPS") == 0 || 
 	strcmp( Instr, "MUL") == 0 || strcmp( Instr, "MULF") == 0 || strcmp( Instr, "OR") == 0 || strcmp( Instr, "RD") == 0 || strcmp( Instr, "RSUB") == 0 || strcmp( Instr, "SSK") == 0 || strcmp( Instr, "STA") == 0 || 
 	strcmp( Instr, "STB") == 0 || strcmp( Instr, "STCH") == 0 || strcmp( Instr, "STF") == 0 || strcmp( Instr, "STI") == 0 || strcmp( Instr, "STL") == 0 || strcmp( Instr, "STS") == 0 || strcmp( Instr, "STSW") == 0 || 
-	strcmp( Instr, "STT") == 0 || strcmp( Instr, "STX") == 0 || strcmp( Instr, "SUB") == 0 || strcmp( Instr, "SUBF") == 0 || strcmp( Instr, "TD") == 0 || strcmp( Instr, "TIX") == 0 || strcmp( Instr, "WD") == 0 || ){
+	strcmp( Instr, "STT") == 0 || strcmp( Instr, "STX") == 0 || strcmp( Instr, "SUB") == 0 || strcmp( Instr, "SUBF") == 0 || strcmp( Instr, "TD") == 0 || strcmp( Instr, "TIX") == 0 || strcmp( Instr, "WD") == 0){
         return 3;
     }//end if
 	
