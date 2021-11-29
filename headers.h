@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-//my edit test
-
+//Defining syntax for cleaner code
+#define instCmp(instruction)      strcmp( Instr, "instruction") == 0
 
 struct symbol {
 	int	DefinedOnSourceLine;
