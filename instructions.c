@@ -4,10 +4,15 @@
 //TODO add compatibility to check instructions with "+" on the front
 char getOpcode(char* Instr){
 		
-		//check if a + is at the start, if so remove
-		if(Instr[0] == +){
-			//TODO add a way to remove + from the front of a function
-		}//end if
+	//check if '+' (ACII 43) is at the start, if so remove
+	if(Instr[0] == 43){
+		//Temporary string that stores Instr w/o the '+'
+		char copyInstr[strlen(Instr) - 1];
+        	//Copies Instr into temp string, starting at index after '+'
+		strcpy(copyInstr, &Instr[1]);
+		//Copies it back into original string, w/o the '+'
+		strcpy(Instr, copyInstr);
+	}//end if
 		
 		
         if(strcmp( Instr, "ADD") == 0){
