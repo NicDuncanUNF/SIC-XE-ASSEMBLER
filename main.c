@@ -809,7 +809,7 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 //# - Immidiate addressing -  operand bound - ?
 //+ - Name? - instruction bound - causes a format 3 instruction to be a format 4
 //Be sure to check in main if the result is valid for it's repsective format
-char chopPrefix(char* chop){
+char* chopPrefix(char* chop){
 	
 	//temporary variable to store the result
 	char temp[7];
@@ -837,6 +837,34 @@ char chopPrefix(char* chop){
 	
 }//end function
 
+/*
+//collects information about the format 4 (+) T record and returns an appropriate M record
+//Input: T record location, 
+char* buildMRecord(char* Tloc, ){
+	char* MRecord = "";
+	
+	//add M to the front of the M record
+	strcat(MRecord, "M");
+	
+	//Add the target address portion, will be 1 byte more than the source T record's location
+	//add a buffer if needed
+	strcat(MRecord, );
+	
+	
+}//end function
+
+//a function used to create a buffer made out of a specific number of specified characters
+char* buildABuffer(int bufferSize, char bufferChar){
+	
+	char* bufferGen;
+	while(bufferSize > 0){
+		strcat(bufferGen, bufferChar);
+		bufferSize--;
+	}//end while
+	
+	return bufferGen;
+}//end function
+*/
 
 
 

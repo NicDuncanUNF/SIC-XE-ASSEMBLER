@@ -15,7 +15,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         strcpy(finalObjectcode, buff); //stores opcode
         strcat(finalObjectcode, ",01");//adds the length
         return finalObjectcode;
-    }
+    }//end if
     else if((token[0] == 'A') || 
     (token[0] == 'X') || 
     (token[0] == 'L') || 
@@ -65,14 +65,14 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
             {
                 return "-1";
             }
-        }//end of for loop
+        }//end for loop
         if(registers[1] == "NULL")//if there is only 1 register, the second is 0
         {
             strcat(finalObjectcode, "0");
-        }
+        }//end if
         strcat(finalObjectcode, ",02");//adds the length
         return finalObjectcode;
-    }
+    }//end else if
     else if(instr[0] == '+') //format 4
     {
         char *tempObjectcode = malloc(33 * sizeof(char)); //will store the binary

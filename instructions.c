@@ -6,12 +6,7 @@ char getOpcode(char* Instr){
 
 		//check if '+' (ACII 43) is at the start, if so remove
 		if(Instr[0] == 43){
-            //Temporary string that stores Instr w/o the '+'
-			char copyInstr[strlen(Instr) - 1];
-            //Copies Instr into temp string, starting at index after '+'
-            strcpy(copyInstr, &Instr[1]);
-            //Copies it back into original string, w/o the '+'
-            strcpy(Instr, copyInstr);
+            Instr = chopPrefix(Instr);
 		}//end if
 
 
