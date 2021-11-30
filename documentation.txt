@@ -24,6 +24,19 @@ hexToBin: Converts a hexedecimal input to binary.
 binToHex: Converts a binary input to hexedecimal.
 
 =====main.c=====
-main:
+main: Where pass 1 and pass 2 reside.
 updateLocation: Gets the location counter movement from each line.
 chopPrefix: Removes a prefix character such as +, #, or @ from a given input.
+
+
+=====Error handling=====
+Pass 1:
+No empty lines present in the file
+Ensuring the program does not exceed the SIC-XE memory limit of 2^20 bytes or 0x100000 bytes.
+Validating that symbols meet SIC-XE's specifications such as starting with appropriate characters or being in all capital characters.
+Watch for duplicate symbol creation.
+
+
+Pass 2:
+Check that valid symbol is referened by instructions.
+Ensure that valid instructions and directives are used.
