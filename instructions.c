@@ -70,7 +70,6 @@ char getOpcode(char* Instr){
 }//end function
 
 
-//TODO find IsAnInstruction function and place here
 //returns 1 if the input is an instruction and 0 if it isnt
 int IsAnInstruction (char* Instr){
 	if(

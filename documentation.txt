@@ -1,0 +1,29 @@
+=====Summary=====
+Created by Nic Duncan, Paul Davis, Brent Melby, and Kaitlyn Turner
+This program is an assembler that creates object code for the SIC-XE assembly language.
+
+=====headers.h=====
+Used to initialize all functions and libraries used throughout the program.
+
+=====directives.c=====
+isADirective: Used to check if an inserted string matches a known system directive.
+
+=====symbols.c=====
+IsAValidSymbol: Checks an inputted symbol against SIC-XE criteria.
+symbolExists: Searches a symbol table to make sure matching symbol does not exist already.
+addSymbol: Finds the next free slot in the symbol table and inserts the validated symbol.
+
+=====instructions.c=====
+getOpcode: gets an equivalent opcode from a given instruction.
+IsAnInstruction: Returns a boolean if the given string is a valid instruction or not.
+getInstrMovement: Returns the byte movement/format a given instruction uses.
+
+=====objectcodes.c=====
+generateObjectcode: TODO
+hexToBin: Converts a hexedecimal input to binary.
+binToHex: Converts a binary input to hexedecimal.
+
+=====main.c=====
+main:
+updateLocation: Gets the location counter movement from each line.
+chopPrefix: Removes a prefix character such as +, #, or @ from a given input.
