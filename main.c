@@ -1,8 +1,7 @@
 #include "headers.h"
-//TESTING
-//TESTING2
-//my edd
-//editedd
+//Preprocessor variables
+//maximum PC reach in pass 2 is about 2100 bytes, document and/or find true number
+#define MAX_PC_REACH 2100
 
 int main( int argc, char* argv[]){
 
@@ -11,12 +10,21 @@ int main( int argc, char* argv[]){
 	//char* newsym;
 	//char* nextoken;
 	//char* thirdToken;
+	//holds the current line
 	char fullline[1024];
+
+	//the location counter
 	int loCounter;
+	//holds the current line's number (each line from file)
 	int lineNum = 0;
+	//used in pass 2 to indicate a START directive have been used
 	int startFound = 0;
+	//array - holds location addresses from each line
 	int loArr[1024];
+	//index of loArr array
 	int loEle = 0;
+	//Boolean, determines if file is standard SIC (0) or XE (1)
+    int isXE = 0;
 
 	if ( argc != 2 ) {
 	printf("ERROR: Usage: %s filename\n", argv[0]);
@@ -31,15 +39,15 @@ int main( int argc, char* argv[]){
 	return 0;
 	}
 
-	char* newsym = malloc(  1024 * sizeof(char)             ); //allocating space
-	memset( newsym, '\0', 1024 * sizeof(char) );	//zeroing it out
-	char* nextoken = malloc(  1024 * sizeof(char)             );
-	memset( nextoken, '\0', 1024 * sizeof(char) );
-	char* thirdToken = malloc(  1024 * sizeof(char)             );
-	memset( thirdToken, '\0', 1024 * sizeof(char) );
+	char* newsym = malloc(  1024 * sizeof(char)            ); //allocating space
+	memset( newsym, '\0', 1024 * sizeof(char)              ); //zeroing it out
+	char* nextoken = malloc(  1024 * sizeof(char)          );
+	memset( nextoken, '\0', 1024 * sizeof(char)            );
+	char* thirdToken = malloc(  1024 * sizeof(char)        );
+	memset( thirdToken, '\0', 1024 * sizeof(char)          );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
 
-
+	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
 		strcpy( fullline, line );
@@ -49,15 +57,15 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}
-
+		//
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
 
-			//printf("b4 first strtok\n");
-			newsym = strtok( line, " \r\t\n");
-			//printf("FULL LINE:%s", fullline );
-			//printf("NEW SYMBOL : %s\n",newsym);
+			//increment the current line we are reading on the file
 			lineNum++;
-			//error check test 4
+			//get the symbol
+			newsym = strtok( line, " \r\t\n");
+
+			//check if the symbol is a system directive
 			if(IsADirective(newsym) == 1){
 				printf("\nERROR:\n\n%s\nLine %d, Symbol with a directive name.\n\n", fullline, lineNum);
 				fclose(fp);
@@ -88,19 +96,21 @@ int main( int argc, char* argv[]){
 					newsym[i] == 41 ||//)
 					newsym[i] == 64 ||//@
 					newsym[i] == 37){//%
-						printf("\nERROR:\n\n%s\nLine %d, Invalid symbol found.\n\n", fullline, lineNum);
+						printf("\nERROR:\n\n%s\nLine %d, Invalid character used in symbol.\n\n", fullline, lineNum);
                                                 fclose(fp);
                                                 return 0;
-					}
+					}//end if
 					else{
 						continue;
-					}
-				}
-			}
+					}//end else
+				}//end for
+			}//end else
 
+			//Get the instruction/directive from the line
 			nextoken = strtok( NULL, " \t\n"  );
-			//printf("NEXT TOKEN ON LINE IS %s\n", nextoken );
-			//if new sym and directive
+
+			//If the middle token is a directive
+			//TODO investigate if directives have any new changes in SICXE
 			if(IsADirective(nextoken) == 1){
 				//printf("%s is a valid directive.\n\n", nextoken);
 				//if else branch of directives for location counter movement
@@ -109,7 +119,7 @@ int main( int argc, char* argv[]){
 					startFound = 1;
 					thirdToken = strtok(NULL, " \r\t\n");
 					//error check 5
-					int maxMem = strtol("8000", NULL, 16);
+					int maxMem = strtol("100000", NULL, 16);
 					if(strtol(thirdToken, NULL, 16) >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, SIC program starts outside of memory.\n\n", fullline, lineNum);
 						fclose(fp);
@@ -133,59 +143,60 @@ int main( int argc, char* argv[]){
 						return 0;
 					}
 					addSymbol(SymbolTable, loCounter, lineNum, newsym);
-					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
+					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum, &isXE);
 					loArr[loEle] = loCounter;
-                                        loEle++;
+                    loEle++;
 					//check test 10 after every usage of  update location
-					int maxMem = strtol("8000", NULL, 16);
+					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                                 fclose(fp);
                                                 return 0;
-					}
+					}//end if
 
-				}
+				}//end else
 
-			}
+			}//end if
 			//if new sym and instruction
 			else if(IsAnInstruction(nextoken) == 1){
 				//printf("%s is a valid instruction.\n\n", nextoken);
 				//move location counter by 3bytes
 				if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
-                                                printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
-                                                fclose(fp);
-                                                return 0;
-                                }
+					printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
+                    fclose(fp);
+                    return 0;
+                }//end if
 				addSymbol(SymbolTable, loCounter, lineNum, newsym);
 				//error check 10
-				loCounter = updateLocation(NULL, NULL, loCounter, fullline, lineNum);
+				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
 				loArr[loEle] = loCounter;
-                                loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+                loEle++;
+				int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-			}
+                                }//end if
+			}//end elseif
+			//if none of the above are triggered, the middle token is an invalid directice or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
 					printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
                                 	fclose(fp);
                                 	return 0;
-				}
+				}//end if
 				else{
 					printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-				}
-			}
+				}//end else
+			}//end else
 
 
 			continue;
-		}
-		//try and condense this
-		//printf("b4 second if\n");
+		}//end if
+
+		//if the
 		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
 			lineNum++;
 			nextoken = strtok( line, " \t\n"  );
@@ -194,52 +205,52 @@ int main( int argc, char* argv[]){
 			if(IsADirective(nextoken) == 1){
                                 //printf("%s is a valid directive.\n\n", nextoken);
                                 //if else branch of directives for location counter movement
-				//error check 10
-				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-                        	loArr[loEle] = loCounter;
+								//error check 10
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
+								loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+								int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-			}
+                                }//end if
+			}//end if
                         else if(IsAnInstruction(nextoken) == 1){
                                 //printf("%s is a valid instruction.\n\n", nextoken);
                                 //move location counter by 3bytes
-				//error check 10
-				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-				loArr[loEle] = loCounter;
+								//error check 10
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
+								loArr[loEle] = loCounter;
                                 loEle++;
-				int maxMem = strtol("8000", NULL, 16);
+								int maxMem = strtol("100000", NULL, 16);
                                 if(loCounter >= maxMem){
                                 	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
                                         fclose(fp);
                                         return 0;
                                 }
-                        }
+                        }//end else if
                         else{
                                 if(IsADirective(nextoken) == 0){
-					printf("%s",nextoken);
+										printf("%s",nextoken);
                                         printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
+                                }//end if =
                                 else{
                                         printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
                                         fclose(fp);
                                         return 0;
-                                }
-                        }
+                                }//end else
+                        }//end else
 			continue;
-		}
-		//edit this to if else and add more specifics i.e line[0] == \n || \r
+		}//end else if
+		//if the line is blank, error out
 		else if(line[0] == '\n' || line[0] == '\r' || line[0] == '\t'){
 			printf("\nERROR:\n\n%s\nLine %d, Blank line found.\n\n", fullline, lineNum+1);
 			fclose(fp);
 			return 0;
-		}
+		}//end else if
 
 
 
@@ -285,12 +296,6 @@ int main( int argc, char* argv[]){
  *									*
  ************************************************************************/
 
-	//getting length of program
-/*	i = 0;
-	while(loArr[i+1] != '\0'){
-		i++;
-	}
-*/
 	int proLen = (loArr[loEle-1] - loArr[0]);
 	//printf("\n\n%X\n\n", proLen);
 
@@ -299,7 +304,7 @@ int main( int argc, char* argv[]){
 	char tRec[1024][1024]; //= malloc(1024 * sizeof(char*));
 	char mRec[1024][1024]; //= malloc(1024 * sizeof(char*));
 	char* eRec = malloc(1024 * sizeof(char));
-        memset( hRec, '\0', 1024 * sizeof(char) );
+    memset( hRec, '\0', 1024 * sizeof(char) );
 	//memset( tRec, '\0', 1024 * sizeof(char*) );
 	//memset( mRec, '\0', 1024 * sizeof(char*) );
 	memset( eRec, '\0', 1024 * sizeof(char) );
@@ -308,20 +313,34 @@ int main( int argc, char* argv[]){
 
 	//variable to keep track of t records
 	int i = 0;
-	char* dirInst = malloc(1024 * sizeof(char));
-	memset( dirInst, '\0', 1024 * sizeof(char) );
-	char* tokThird = malloc(1024 * sizeof(char));
-        memset( tokThird, '\0', 1024 * sizeof(char) );
+	//dirInst stores a directive/instruction
+    char* dirInst =  malloc(  1024 * sizeof(char) );
+    memset( dirInst, '\0', 1024 * sizeof(char) );
+    //oper stores the token after dirInst
+    char* oper =  malloc(  1024 * sizeof(char ) );
+    memset( oper, '\0', 1024 * sizeof(char) );
+	char* tokThird = malloc(1024 * sizeof(char) );
+    memset( tokThird, '\0', 1024 * sizeof(char) );
+    char* genObjAppend = malloc(1024 * sizeof(char) );
+	memset( genObjAppend, '\0', 1024 * sizeof(char) );
+	char* objAppend = malloc(1024 * sizeof(char) );
+	memset( objAppend, '\0', 1024 * sizeof(char) );
+	char* sizeAppend = malloc(1024 * sizeof(char) );
+	memset( sizeAppend, '\0', 1024 * sizeof(char) );
 
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
-		//if comment
+
+		//If line is a comment
 		if ( line[0] == 35) {
 			continue;
 		}//end if
-		//if label
+
+		//If line starts with a symbol/label
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
 
+            //Skip symbol part of line
 			strtok( line, " \r\t\n");
+			//Store directive/instruction to dirInst
 			dirInst = strtok( NULL, " \r\t\n");
 
 			//directive start (header record)
@@ -472,45 +491,65 @@ int main( int argc, char* argv[]){
 			}
 			//if instruction (t record)
 			else if(IsAnInstruction(dirInst) == 1){
-				strcat(tRec[i], "T");
-                                char buff[1024];
-                                snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-                                strcat(tRec[i], buff);
-				strcat(tRec[i], "03");
-				//not sure what this was about but for some reason the "E0" that instruction TD returned
-				//kept coming out with 6 F's in front. I looked it up and the below code was the solution
-				snprintf(buff, sizeof(buff), "%02X", getOpcode(dirInst) & 0xff);
-				strcat(tRec[i], buff);
-				//printf("\n\n%s\n\n", dirInst);
-				tokThird = strtok( NULL, " '\r\t\n");
-				//printf("\n\nTok tok third is %s\n\n",tokThird);
-                                int j = 0;
-                                while(SymbolTable[j+1] != NULL){
-                                        if(strcmp(SymbolTable[j]->Name, tokThird) == 0){
-                                                break;
-                                        }
-                                        j++;
-                                }
-                                if(SymbolTable[j+1] == NULL){
-                                        printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
-                                        fclose(fp);
-                                        exit(0);
-                                }
-                                snprintf(buff, sizeof(buff), "%04X", SymbolTable[j]->Address);
-				strcat(tRec[i], buff);
-				//printf("Label instruction record:\n");
-                                //printf("%s\n",tRec[i]);
-				//modification required (m record)
+
+                //Store third token to oper
+                oper = strtok( NULL, " ,\r\t\n");
+
+                //-------------------------------------------------
+                //---------------T RECORD GENERATION---------------
+                //-------------------------------------------------
+                //Concat 'T' to t record
+                strcat(tRec[i], "T");
+
+                char buff[1024];
+                //Add location address to a buffer, then append buffer to t record
+                snprintf(buff, sizeof(buff), "%06X", loArr[i]);
+                strcat(tRec[i], buff);
+
+                //Calls function that returns object code and size of instruction, formatted 'objectcode,size'
+                genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+
+                    //Error checking
+                    if (strcmp(genObjAppend, "-1") == 0){
+                        printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                        fclose(fp);
+                        exit(0);
+                    }//end if
+                    if (strcmp(genObjAppend, "-2") == 0){
+                        printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
+                        fclose(fp);
+                        exit(0);
+                    }//end if
+
+                //Break generateObjectcode's returned string in two with comma delimiter
+                sizeAppend = strtok(genObjAppend, " ,");
+                objAppend = strtok(genObjAppend, " ,");
+
+                //Append size to T record
+                strcat(tRec[i], sizeAppend);
+
+                //Append object code to T record
+                strcat(tRec[i], objAppend);
+
+
+                //-------------------------------------------------
+                //---------------M RECORD GENERATION---------------
+                //-------------------------------------------------
 				strcat(mRec[i], "M");
-                                snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
-                                strcat(mRec[i], buff);
-				snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
-                                strcat(mRec[i], buff);
-				//printf("Label instruction modification record:\n");
-                                //printf("%s\n",mRec[i]);
-				//printf("Label inst location: %X\n", loArr[i]);
+                snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
+                strcat(mRec[i], buff);
+
+                if (isXE == 0){
+                    snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
+                }
+                else if (isXE == 1){
+                    snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
+                }
+
+                strcat(mRec[i], buff);
+
 				i++;
-                                continue;
+                continue;
 			}
 			else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
 				//printf("Reserve location: %X\n", loArr[i]);
@@ -519,106 +558,71 @@ int main( int argc, char* argv[]){
                 	}//end else if
 		}//end if
 
-		//if instruction with no label (t record)
+		//if line with no label (t record)
+		//TODO might need to adjust to handle possibility of dirInst being a directive (e.g. RSUB line)
 		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
-			char* dirInst =  malloc(  1024 * sizeof(char)             );
-        		memset( dirInst, '\0', 1024 * sizeof(char) );
-			dirInst = strtok( line, " \r\t\n");
-			char* oper =  malloc(  1024 * sizeof(char)             );
-        		memset( oper, '\0', 1024 * sizeof(char) );
-			oper = strtok( NULL, " ,\r\t\n");
-			//prevents segfaulting at lines with only one token
-			if(oper == NULL){
-				strcat(tRec[i], "T");
-                        	char buff[1024];
-                        	snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-				strcat(tRec[i], buff);
-				strcat(tRec[i], "03");
-                        	snprintf(buff, sizeof(buff), "%02X", getOpcode(dirInst) & 0xff);
-                        	strcat(tRec[i], buff);
-				strcat(tRec[i], "0000");
-				//printf("One token line location: %X\n", loArr[i]);
-				i ++;
-				continue;
-			}
-			strcat(tRec[i], "T");
-                        char buff[1024];
-                        snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-                        strcat(tRec[i], buff);
-			strcat(tRec[i], "03");
-			snprintf(buff, sizeof(buff), "%02X", getOpcode(dirInst) & 0xff);
-                        strcat(tRec[i], buff);
-			char* X = strtok( NULL, " ,\r\t\n");
-			//regular addressing
-			if(X == NULL){
-				int j = 0;
-                        	while(SymbolTable[j+1] != NULL){
-                                	if(strcmp(SymbolTable[j]->Name, oper) == 0){
-                                        	break;
-                                	}
-                                	j++;
-                        	}
-                        	if(SymbolTable[j+1] == NULL){
-                               		printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", oper);
-                               		fclose(fp);
-                               		exit(0);
-                        	}
-                        	snprintf(buff, sizeof(buff), "%04X", SymbolTable[j]->Address);
-                        	strcat(tRec[i], buff);
-				//printf("\n\noper is %s\n\n", oper);
-                        	//printf("No label instruction record:\n");
-                        	//printf("%s\n",tRec[i]);
-                        	//modification is required (m record)
-                        	strcat(mRec[i], "M");
-                        	snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
-                        	strcat(mRec[i], buff);
-                        	snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
-                        	strcat(mRec[i], buff);
-                        	//printf("Label instruction modification record:\n");
-                        	//printf("%s\n",mRec[i]);
-				//printf("\n\nIterations: %d\n\n", i);
-				//printf("No label instr location: %X\n", loArr[i]);
-				i++;
-				continue;
-			}
-			//indexed addressing
-			else if(strcmp(X, "X") == 0){
-				int j = 0;
-                                while(SymbolTable[j+1] != NULL){
-                                        if(strcmp(SymbolTable[j]->Name, oper) == 0){
-                                                break;
-                                        }
-                                        j++;
-                                }
-                                if(SymbolTable[j+1] == NULL){
-                                        printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", oper);
-                                        fclose(fp);
-                                        exit(0);
-                                }
-                                snprintf(buff, sizeof(buff), "%04X", SymbolTable[j]->Address + 32768);
-                                strcat(tRec[i], buff);
-				//printf("No label instruction record (indexed):\n");
-                                //printf("%s\n",tRec[i]);
-                                //modification is required (m record)
-                                strcat(mRec[i], "M");
-                                snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
-                                strcat(mRec[i], buff);
-                                snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
-                                strcat(mRec[i], buff);
-                                //printf("%s\n",mRec[i]);
-				//printf("No label indexed instr location: %X\n", loArr[i]);
-				i++;
-				continue;
-			}//end else if
 
-		}//end else if
-/*
-		else{
-			i += 2;
-                        continue;
-		}
-		//blank lines tested for in first pass through
-*/
+            //Tokenize the line
+            dirInst = strtok( line, " \r\t\n");
+            oper = strtok( NULL, " ,\r\t\n");
+
+			//-------------------------------------------------
+			//---------------T RECORD GENERATION---------------
+			//-------------------------------------------------
+            //Concat 'T' to t record
+            strcat(tRec[i], "T");
+
+            char buff[1024];
+            //Add location address to a buffer, then append buffer to t record
+            snprintf(buff, sizeof(buff), "%06X", loArr[i]);
+            strcat(tRec[i], buff);
+
+            //Calls function that returns object code and size of instruction, formatted 'objectcode,size'
+            genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+
+                //Error checking
+                if (strcmp(genObjAppend, "-1") == 0){
+                    printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                    fclose(fp);
+                    exit(0);
+                }//end if
+                if (strcmp(genObjAppend, "-2") == 0){
+                    printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
+                    fclose(fp);
+                    exit(0);
+                }//end if
+
+            //Break generateObjectcode's returned string in two with comma delimiter
+            sizeAppend = strtok(genObjAppend, " ,");
+            objAppend = strtok(genObjAppend, " ,");
+
+            //Append size to T record
+            strcat(tRec[i], sizeAppend);
+
+            //Append object code to T record
+            strcat(tRec[i], objAppend);
+
+
+            //-------------------------------------------------
+            //---------------M RECORD GENERATION---------------
+            //-------------------------------------------------
+            strcat(mRec[i], "M");
+            snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
+            strcat(mRec[i], buff);
+
+            if (isXE == 0){
+                snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
+            }
+            else if (isXE == 1){
+                snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
+            }
+
+            strcat(mRec[i], buff);
+
+            i++;
+            continue;
+
+        }//end else if
 	}//end while
 
 
@@ -632,47 +636,82 @@ int main( int argc, char* argv[]){
 		printf("%X\n",loArr[l]);
 		l++;
 	}
-
 	printf("\n\nloArr size: %d\n\n", l);
 	printf("\n\niteration ammount: %d\n\n", i);
 */
-	char buf[1024];
-	snprintf(buf, sizeof(buf), "%s.obj", argv[1]);
-	fp = fopen(buf, "w");
 
-	//print header
-	fprintf(fp, "%s\n",hRec);
-	//for loop to print texts
-	for(int j=0; j<i;j++){
-		if(tRec[j][0] != 'T'){
-			continue;
-		}
-		fprintf(fp, "%s\n",tRec[j]);
-	}
-	//for loop to print modifications
-	for(int k=0; k<i;k++){
-		if(mRec[k][0] != 'M'){
-                        continue;
-                }
-                fprintf(fp, "%s\n",mRec[k]);
+
+    //-------------------------------------------------
+    //--------------WRITE RECORDS TO FILE--------------
+    //-------------------------------------------------
+        char buf[1024];
+        snprintf(buf, sizeof(buf), "%s.obj", argv[1]);
+        fp = fopen(buf, "w");
+
+        //Write h record
+        fprintf(fp, "%s\n",hRec);
+
+        //Print t records
+        for(int j=0; j<i;j++){
+            if(tRec[j][0] != 'T'){
+                continue;
+            }
+            fprintf(fp, "%s\n",tRec[j]);
         }
-	//print end
-	fprintf(fp, "%s\n",eRec);
 
-	fclose( fp );
+        //Print m records
+        for(int k=0; k<i;k++){
+            if(mRec[k][0] != 'M'){
+                            continue;
+                    }
+                    fprintf(fp, "%s\n",mRec[k]);
+            }
 
+        //Print e record
+        fprintf(fp, "%s\n",eRec);
+
+        //close file
+        fclose( fp );
 
 
 }//end main
 
+
 //edit this to feed line and line number into parameters for error messages
-int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber){
+int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber, int* isXE){
 	//if else for directives that move locounter somewhere other than 3 bytes
-        if(tokThird == NULL){
-                //if instruction, move locounter 3 bytes
-                currCount = currCount + 3;
+        //instruction movement calculation based on format
+		if(IsAnInstruction(dirInst) != 0){
+                //different formats move their respective number in bytes
+                //Note: Format 3 can either be standard or XE.
+                    //However, 1, 2 and 4 HAVE to be XE, therefore we can confidently flip isXE boolean
+
+				//if format 4
+				if(getInstrMovement(tokThird) == 4){
+                    *isXE = 1;
+					return (currCount + 4);
+				}//end if
+				//if format 3
+				else if(getInstrMovement(tokThird) == 3){
+					return (currCount + 3);
+				}//end if
+				//if format 2
+				else if(getInstrMovement(tokThird) == 2){
+				    *isXE = 1;
+					return (currCount + 2);
+				}//end if
+				//if format 1
+				else if(getInstrMovement(tokThird) == 1){
+				    *isXE = 1;
+					return (currCount + 1);
+				}//end if
+
+				else{
+
+				}//end if
+
                 return currCount;
-        }
+        }//end if
 	else if(strcmp(dirInst, "BYTE") == 0){
 		//parse string for c string(move loCounter stringlength) for x(move loCounter 1 for each pair)
 		//5,4,2,10 easiest checks according to fred
@@ -771,27 +810,30 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 }
 
 
-//returns zero or non zero//
-int symbolExists(struct symbol* Tab[], char* sName){
-	//printf("Symbol exists entered \n\n");
-	int result = 0;
-	int index = 0;
-	while(Tab[index] != NULL){
-        	if(strcmp(sName, Tab[index]->Name) == 0){
-                	result = -1;
-			//printf("Dup found in symbol exists\n");
-                	break;
-        	}//end if
-		else{
-			//printf("\nSymbol exists else entered %d times\n",index);
-        		index++;
-			continue;
-		}
-	}//end while
+//removes the addressing identifier from a provided instruction or operand
+//key symbols are:
+//@ - Indirect addressing - operand bound - essentially a pointer
+//# - Immediate addressing -  operand bound - ?
+//+ - Name? - instruction bound - causes a format 3 instruction to be a format 4
+//Be sure to check in main if the result is valid for it's respective format
+char* chopPrefix(char* chop){
 
-	return result;
-}
+    //Temporary string that stores chop w/o the prefix
+    char copyChop[strlen(chop) - 1];
 
+	//check if instruction has a prefix (+ (43), # (35), @ (64)), if so remove
+    if(chop[0] == 43 || chop[0] == 64 || chop[0] == 35){
+        //Copies chop into temp string, starting at index after prefix
+        strcpy(copyChop, &chop[1]);
+        //Copy it back into original string so that we're not returning an address of a local variable
+        strcpy(chop, copyChop);
 
+        //return string w/o prefix
+        return chop;
+    }//end if
 
+    //return original string if there never was a prefix
+    return chop;
+	//printf("\n Newly chopped token is: %s", temp);
 
+}//end function

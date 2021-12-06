@@ -1,5 +1,5 @@
-project4:	main.o symbols.o  directives.o instructions.o headers.h
-	gcc -o project2 -Wall  -O0 main.o symbols.o directives.o instructions.o
+project4:	main.o symbols.o  directives.o instructions.o objectcodes.o headers.h
+	gcc -o project4 -Wall  -O0 main.o symbols.o directives.o instructions.o objectcodes.o
 
 main.o:	main.c headers.h
 	gcc -c -Wall  -O0 main.c
@@ -12,6 +12,9 @@ directives.o:	directives.c headers.h
 
 instructions.o:	instructions.c headers.h
 	gcc -c -Wall  -O0 instructions.c
+	
+objectcodes.o: objectcodes.c headers.h
+	gcc -c -Wall  -O0 objectcodes.c
 
 clean:
 	rm *.o -f
