@@ -2,6 +2,10 @@
 //Preprocessor variables
 //maximum PC reach in pass 2 is about 2100 bytes, document and/or find true number
 #define MAX_PC_REACH 2100
+//max sic xe memory in hex
+#define MAX_SICXE_MEMORY 10000
+#define MAXTRECORDS 1000
+#define MAXMRECORDS 1000
 
 int main( int argc, char* argv[]){
 

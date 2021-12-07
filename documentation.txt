@@ -43,10 +43,11 @@ Check that valid symbol is referened by format 3 instructions.
 Ensure that valid instructions and directives are used.
 
 =====Limitations=====
-Max SIC-XE program size: 2^20 bytes, or 
+Max SIC-XE program size: 2^20 bytes, or 0x100000 bytes
 Maximum Symbol Table size:
 Max T records:
 Max M records:
+Will only output object code a SICXE machine can utilize.
 
 =====Current Issues=====
 Pass 1: 
@@ -59,11 +60,13 @@ Clean up git repository of all compiler related and unneeded files and folders.
 =====Presenation Notes=====
 language and tools used
 goal of project
-Overview of logic flow and designn choices
+Overview of logic flow and design choices (Storage types, tokens, structures)
 Show documentation (Create man page?)
 Error control methods
 Changes needed in order to process SICXE code
-Things we could have done better/ Issues
+Things we could have done better/Issues
+Limitations
+Output example
 Lessons learned (Communication, Coordination, Git, )
 Asymptotic Runtime/Efficiency
 Conclusions/Questions
