@@ -64,7 +64,7 @@ int main( int argc, char* argv[]){
 		if(line == NULL){
 			printf("\nERROR: \n\n%s\nLine %d, Line is empty.\n\n", fullline, lineNum);
 		}//end if
-		
+
 		//For lines with symbols
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
 
@@ -517,20 +517,27 @@ int main( int argc, char* argv[]){
                 snprintf(buff, sizeof(buff), "%06X", loArr[i]);
                 strcat(tRec[i], buff);
 
-                //Calls function that returns object code and size of instruction, formatted 'objectcode,size'
-                genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+                //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
+                if(symbolExists(SymbolTable, oper) == -1)
+                {
+                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
+                }
+                else
+                {
+                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+                }
 
-                    //Error checking
-                    if (strcmp(genObjAppend, "-1") == 0){
-                        printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
-                        fclose(fp);
-                        exit(0);
-                    }//end if
-                    if (strcmp(genObjAppend, "-2") == 0){
-                        printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
-                        fclose(fp);
-                        exit(0);
-                    }//end if
+                //Error checking
+                if (strcmp(genObjAppend, "-1") == 0){
+                    printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                    fclose(fp);
+                    exit(0);
+                }//end if
+                if (strcmp(genObjAppend, "-2") == 0){
+                    printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
+                    fclose(fp);
+                    exit(0);
+                }//end if
 
                 //Break generateObjectcode's returned string in two with comma delimiter
                 sizeAppend = strtok(genObjAppend, " ,");
@@ -582,8 +589,15 @@ int main( int argc, char* argv[]){
             snprintf(buff, sizeof(buff), "%06X", loArr[i]);
             strcat(tRec[i], buff);
 
-            //Calls function that returns object code and size of instruction, formatted 'objectcode,size'
-            genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+            //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
+                if(symbolExists(SymbolTable, oper) == -1)
+                {
+                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
+                }
+                else
+                {
+                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+                }
 
                 //Error checking
                 if (strcmp(genObjAppend, "-1") == 0){
