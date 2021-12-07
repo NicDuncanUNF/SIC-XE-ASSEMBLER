@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//Defining syntax for cleaner code
-#define instCmp(instruction)      strcmp( Instr, "instruction") == 0
-
 struct symbol {
 	int	DefinedOnSourceLine;
 	int	Address;
@@ -27,7 +24,7 @@ OPCODES OpcodeTable[ 32 ];
 
 
 //Functions from main.c
-int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber, int* isXE);
+int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber);
 char* chopPrefix(char* chop);
 
 //function from directives.c
@@ -40,7 +37,7 @@ int symbolExists(struct symbol* Tab[], char* sName);
 
 //Functions from instructions.c
 char getOpcode(char* Instr);
-int IsAnInstruction (char* Instr);
+int IsAnInstruction(char* Instr);
 int getInstrMovement(char* Instr);
 
 //Functions from objectcodes.c

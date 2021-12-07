@@ -23,8 +23,6 @@ int main( int argc, char* argv[]){
 	int loArr[1024];
 	//index of loArr array
 	int loEle = 0;
-	//Boolean, determines if file is standard SIC (0) or XE (1)
-    int isXE = 0;
 
 	if ( argc != 2 ) {
 	printf("ERROR: Usage: %s filename\n", argv[0]);
@@ -50,6 +48,7 @@ int main( int argc, char* argv[]){
 	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
+        printf("Line: %s\n", line);
 		strcpy( fullline, line );
 		if ( line[0] == 35) {
 			//printf("COMMENT:%s", line );
@@ -57,7 +56,7 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}
-		//
+		//For lines with symbols
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
 
 			//increment the current line we are reading on the file
@@ -112,7 +111,6 @@ int main( int argc, char* argv[]){
 			//If the middle token is a directive
 			//TODO investigate if directives have any new changes in SICXE
 			if(IsADirective(nextoken) == 1){
-				//printf("%s is a valid directive.\n\n", nextoken);
 				//if else branch of directives for location counter movement
 				//no need to check if start exists right now
 				if(strcmp(nextoken, "START") == 0){
@@ -143,7 +141,8 @@ int main( int argc, char* argv[]){
 						return 0;
 					}
 					addSymbol(SymbolTable, loCounter, lineNum, newsym);
-					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum, &isXE);
+					//printf("\n\nLINE 146\n\n");
+					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
 					loArr[loEle] = loCounter;
                     loEle++;
 					//check test 10 after every usage of  update location
@@ -157,10 +156,9 @@ int main( int argc, char* argv[]){
 				}//end else
 
 			}//end if
-			//if new sym and instruction
 			else if(IsAnInstruction(nextoken) == 1){
 				//printf("%s is a valid instruction.\n\n", nextoken);
-				//move location counter by 3bytes
+				//move location counter by 3 bytes
 				if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
 					printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
                     fclose(fp);
@@ -168,7 +166,8 @@ int main( int argc, char* argv[]){
                 }//end if
 				addSymbol(SymbolTable, loCounter, lineNum, newsym);
 				//error check 10
-				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
+				//printf("\n\nLINE 172\n\n");
+				loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
 				loArr[loEle] = loCounter;
                 loEle++;
 				int maxMem = strtol("100000", NULL, 16);
@@ -177,11 +176,11 @@ int main( int argc, char* argv[]){
                                         fclose(fp);
                                         return 0;
                                 }//end if
-			}//end elseif
-			//if none of the above are triggered, the middle token is an invalid directice or instruction.
+			}//end else if
+			//if none of the above are triggered, the middle token is an invalid directive or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
-					printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
+					printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d ERROR ONE\n\n", lineNum);//TODO Fix error code
                                 	fclose(fp);
                                 	return 0;
 				}//end if
@@ -195,9 +194,9 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}//end if
-
 		//if the
 		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
+            printf("\n\nNON-SYMBOL LINE\n\n");
 			lineNum++;
 			nextoken = strtok( line, " \t\n"  );
 			//printf("\nFULL LINE:%s", fullline );
@@ -206,7 +205,8 @@ int main( int argc, char* argv[]){
                                 //printf("%s is a valid directive.\n\n", nextoken);
                                 //if else branch of directives for location counter movement
 								//error check 10
-								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
+								//printf("\n\nLINE 211\n\n");
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
 								loArr[loEle] = loCounter;
                                 loEle++;
 								int maxMem = strtol("100000", NULL, 16);
@@ -220,7 +220,8 @@ int main( int argc, char* argv[]){
                                 //printf("%s is a valid instruction.\n\n", nextoken);
                                 //move location counter by 3bytes
 								//error check 10
-								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum, &isXE);
+								//printf("\n\nLINE 226\n\n");
+								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
 								loArr[loEle] = loCounter;
                                 loEle++;
 								int maxMem = strtol("100000", NULL, 16);
@@ -233,7 +234,7 @@ int main( int argc, char* argv[]){
                         else{
                                 if(IsADirective(nextoken) == 0){
 										printf("%s",nextoken);
-                                        printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d\n\n", lineNum);
+                                        printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: ERROR TWO%d\n\n", lineNum);//TODO FIX ERROR CODE
                                         fclose(fp);
                                         return 0;
                                 }//end if =
@@ -539,13 +540,7 @@ int main( int argc, char* argv[]){
                 snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
                 strcat(mRec[i], buff);
 
-                if (isXE == 0){
-                    snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
-                }
-                else if (isXE == 1){
-                    snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
-                }
-
+                snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
                 strcat(mRec[i], buff);
 
 				i++;
@@ -610,13 +605,7 @@ int main( int argc, char* argv[]){
             snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
             strcat(mRec[i], buff);
 
-            if (isXE == 0){
-                snprintf(buff, sizeof(buff), "04+%s", SymbolTable[0]->Name);
-            }
-            else if (isXE == 1){
-                snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
-            }
-
+            snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
             strcat(mRec[i], buff);
 
             i++;
@@ -678,31 +667,28 @@ int main( int argc, char* argv[]){
 
 
 //edit this to feed line and line number into parameters for error messages
-int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber, int* isXE){
+int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber){
+    //printf("\n\nupdateLocation called\n\n");
 	//if else for directives that move locounter somewhere other than 3 bytes
         //instruction movement calculation based on format
+        //printf("\n\nCalling IsAnInstruction from updateLocation, with instruction |%s|\n\n", dirInst);
 		if(IsAnInstruction(dirInst) != 0){
                 //different formats move their respective number in bytes
-                //Note: Format 3 can either be standard or XE.
-                    //However, 1, 2 and 4 HAVE to be XE, therefore we can confidently flip isXE boolean
 
 				//if format 4
-				if(getInstrMovement(tokThird) == 4){
-                    *isXE = 1;
+				if(getInstrMovement(dirInst) == 4){
 					return (currCount + 4);
 				}//end if
 				//if format 3
-				else if(getInstrMovement(tokThird) == 3){
+				else if(getInstrMovement(dirInst) == 3){
 					return (currCount + 3);
 				}//end if
 				//if format 2
-				else if(getInstrMovement(tokThird) == 2){
-				    *isXE = 1;
+				else if(getInstrMovement(dirInst) == 2){
 					return (currCount + 2);
 				}//end if
 				//if format 1
-				else if(getInstrMovement(tokThird) == 1){
-				    *isXE = 1;
+				else if(getInstrMovement(dirInst) == 1){
 					return (currCount + 1);
 				}//end if
 
@@ -717,10 +703,10 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 		//5,4,2,10 easiest checks according to fred
 
 		//printf("\n\n%s\n\n", tokThird);
-		char* XorC = strtok(tokThird,"'");
+		char* XorC = strtok(tokThird," '");
 		//printf("\n\n%s\n\n", XorC);
 		if(strcmp(XorC, "C") == 0){
-			char* byteCheck = strtok(NULL, "'");
+			char* byteCheck = strtok(NULL, " '");
 			//printf("\n\n%s\n\n", byteCheck);
                 	currCount = currCount + (int)strlen(byteCheck);
 			//printf("\n\n%d\n\n", (int)strlen(byteCheck));
@@ -732,25 +718,9 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 			if(strlen(byteCheck) % 2 == 0){
 				int validHex = 1;
 				for(int i = 0; i < strlen(byteCheck); i++){
-					if(byteCheck[i] == 48 ||
-					byteCheck[i] == 49 ||
-					byteCheck[i] == 50 ||
-					byteCheck[i] == 51 ||
-					byteCheck[i] == 52 ||
-					byteCheck[i] == 53 ||
-					byteCheck[i] == 54 ||
-					byteCheck[i] == 55 ||
-					byteCheck[i] == 56 ||
-					byteCheck[i] == 57 ||
-					byteCheck[i] == 65 ||
-					byteCheck[i] == 66 ||
-					byteCheck[i] == 67 ||
-					byteCheck[i] == 68 ||
-					byteCheck[i] == 69 ||
-					byteCheck[i] == 70 ){
-
-						continue;
-					}
+					if( (byteCheck[i] >= 48 && byteCheck[i] <= 57) ||
+                        (byteCheck[i] >= 65 && byteCheck[i] <= 70) )
+                        { continue; }
 					else{
 						validHex = 0;
 						break;
@@ -767,12 +737,12 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 				}
 			}
 			else{
-				printf("ERROR. INVALID BYTE CONSTANT FOUND.");
+				printf("ERROR. INVALID BYTE CONSTANT FOUND. FIRST ERROR\n\n");
 				exit(0);
 			}
 		}
 		else{
-			printf("ERROR. INVALID BYTE CONSTANT FOUND.");
+			printf("ERROR. INVALID BYTE CONSTANT FOUND. SECOND ERROR%s\n\n", XorC);
 			exit(0);
 		}
 		char* byteCheck = strtok(NULL, " '");
@@ -809,6 +779,32 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 
 }
 
+int IsAnInstruction(char* Instr){
+	if(
+        strcmp( Instr, "ADD") == 0   || strcmp( Instr, "ADDF") == 0  || strcmp( Instr, "AND") == 0  || strcmp( Instr, "COMP") == 0 ||
+        strcmp( Instr, "COMPF") == 0 || strcmp( Instr, "DIV") == 0   || strcmp( Instr, "DIVF") == 0 || strcmp( Instr, "J") == 0    ||
+        strcmp( Instr, "JEQ") == 0   || strcmp( Instr, "JGT") == 0   || strcmp( Instr, "JLT") == 0  || strcmp( Instr, "JSUB") == 0 ||
+        strcmp( Instr, "LDA") == 0   || strcmp( Instr, "LDB") == 0   || strcmp( Instr, "LDCH") == 0 || strcmp( Instr, "LDF") == 0  ||
+        strcmp( Instr, "LDL") == 0   || strcmp( Instr, "LDS") == 0   || strcmp( Instr, "LDT") == 0  || strcmp( Instr, "LDX") == 0  ||
+        strcmp( Instr, "LPS") == 0   || strcmp( Instr, "MUL") == 0   || strcmp( Instr, "MULF") == 0 || strcmp( Instr, "OR") == 0   ||
+        strcmp( Instr, "RD") == 0    || strcmp( Instr, "RSUB") == 0  || strcmp( Instr, "SSK") == 0  || strcmp( Instr, "STA") == 0  ||
+        strcmp( Instr, "STB") == 0   || strcmp( Instr, "STCH") == 0  || strcmp( Instr, "STF") == 0  || strcmp( Instr, "STI") == 0  ||
+        strcmp( Instr, "STL") == 0   || strcmp( Instr, "STS") == 0   || strcmp( Instr, "STSW") == 0 || strcmp( Instr, "STT") == 0  ||
+        strcmp( Instr, "STX") == 0   || strcmp( Instr, "SUB") == 0   || strcmp( Instr, "SUBF") == 0 || strcmp( Instr, "TD") == 0   ||
+        strcmp( Instr, "TIX") == 0   || strcmp( Instr, "WD") == 0    || strcmp( Instr, "ADDR") == 0 || strcmp( Instr, "CLEAR") == 0||
+        strcmp( Instr, "COMPR") == 0 || strcmp( Instr, "DIVR") == 0  || strcmp( Instr, "MULR") == 0 || strcmp( Instr, "RMO") == 0  ||
+        strcmp( Instr, "SHIFTL") == 0|| strcmp( Instr, "SHIFTR") == 0|| strcmp( Instr, "SUBR") == 0 || strcmp( Instr, "SVC") == 0  ||
+        strcmp( Instr, "TIXR") == 0  || strcmp( Instr, "FIX") == 0   || strcmp( Instr, "FLOAT") == 0|| strcmp( Instr, "HIO") == 0  ||
+        strcmp( Instr, "NORM") == 0  || strcmp( Instr, "SIO") == 0   || strcmp( Instr, "TIO") == 0
+    ){
+        return 1;
+    }//end if
+	//else
+	else{
+		return 0;
+	}//end else
+
+}//end function
 
 //removes the addressing identifier from a provided instruction or operand
 //key symbols are:

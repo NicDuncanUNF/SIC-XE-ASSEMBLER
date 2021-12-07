@@ -65,3 +65,24 @@
 1638836580 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\instructions.c
 	"headers.h"
 
+1637798209 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\directives.c
+	"headers.h"
+
+1638845416 d:\documents\github\sic-xe-assembler\sic-xe-assembler\headers.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1638857672 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\instructions.c
+	"headers.h"
+
+1638836605 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\objectcodes.c
+	"headers.h"
+	"stdlib.h"
+
+1638836598 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
+	"headers.h"
+
+1638846415 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\main.c
+	"headers.h"
+
