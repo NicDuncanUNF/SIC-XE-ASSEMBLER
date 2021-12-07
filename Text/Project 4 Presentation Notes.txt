@@ -1,0 +1,5 @@
+Why we chose a pre-existing project, what modifications we did to make it XE ready
+Most challenging parts of implementing XE
+
+
+We decided it would save a lot of time if we chose a pre-existing program and simply cleaned it up with our combined knowledge. This way, we got the program to a good readable state before beginning the XE implementation.

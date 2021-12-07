@@ -1,0 +1,18 @@
+Re-understand regular SIC program
+Get familiar with our code
+Watch XE lecture
+Watch XE example posted in the server
+
+Try to get sys soft textbook pdf
+Read other people's implementations online like a boss
+
+
+
+
+
+If XE boolean flipped
+	address limit is 1MB instead of 32,768 bytes (32k or 2^15)
+	
+Never really used registers in SIC program (A, X, L, PC, SW)
+	So is it necessary to implement XE registers? (B, S, T, F)
+	

@@ -63,6 +63,75 @@ char getOpcode(char* Instr){
                 return 0x2C;
         }else if(strcmp( Instr, "WD") == 0){
                 return 0xDC;
+<<<<<<< Updated upstream
+=======
+        }else if(instCmp("ADDF") ){
+            return 0x58;
+        }else if(instCmp("ADDR") ){
+            return 0x90;
+        }else if(instCmp("CLEAR") ){
+            return 0xB4;
+        }else if(instCmp("COMPF") ){
+            return 0x88;
+        }else if(instCmp("COMPR") ){
+            return 0xA0;
+        }else if(instCmp("DIVF") ){
+            return 0x64;
+        }else if(instCmp("DIVR") ){
+            return 0x9C;
+        }else if(instCmp("FIX") ){
+            return 0xC4;
+        }else if(instCmp("FLOAT") ){
+            return 0xC0;
+        }else if(instCmp("HIO") ){
+            return 0xF4;
+        }else if(instCmp("LDB") ){
+            return 0x68;
+        }else if(instCmp("LDF") ){
+            return 0x70;
+        }else if(instCmp("LDS") ){
+            return 0x6C;
+        }else if(instCmp("LDT") ){
+            return 0x74;
+        }else if(instCmp("LPS") ){
+            return 0xD0;
+        }else if(instCmp("MULF") ){
+            return 0x60;
+        }else if(instCmp("MULR") ){
+            return 0x98;
+        }else if(instCmp("NORM") ){
+            return 0xC8;
+        }else if(instCmp("RMO") ){
+            return 0xAC;
+        }else if(instCmp("SHIFTL") ){
+            return 0xA4;
+        }else if(instCmp("SHIFTR") ){
+            return 0xA8;
+        }else if(instCmp("SIO") ){
+            return 0xF0;
+        }else if(instCmp("SSK") ){
+            return 0xEC;
+        }else if(instCmp("STB") ){
+            return 0x78;
+        }else if(instCmp("STF") ){
+            return 0x80;
+        }else if(instCmp("STI") ){
+            return 0xD4;
+        }else if(instCmp("STS") ){
+            return 0x7C;
+        }else if(instCmp("STT") ){
+            return 0x84;
+        }else if(instCmp("SUBF") ){
+            return 0x5C;
+        }else if(instCmp("SUBR") ){
+            return 0x94;
+        }else if(instCmp("SVC") ){
+            return 0xB0;
+        }else if(instCmp("TIO") ){
+            return 0xF8;
+        }else if(instCmp("TIXR") ){
+            return 0xB8;
+>>>>>>> Stashed changes
         }else{
                 printf("\nunrecognized instruction found\n\n%s\n\n",Instr);
 		return 0;

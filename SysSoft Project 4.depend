@@ -1,0 +1,67 @@
+# depslib dependency file v1.0
+1637798209 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\directives.c
+	"headers.h"
+
+1638232144 d:\downloads\unf\fall 2021\system software\syssoft project 4\headers.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1638227087 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\recordbuilder.c
+	"headers.h"
+
+1638227127 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\symbols.c
+	"headers.h"
+
+1638241460 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\instructions.c
+	"headers.h"
+
+1638233465 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\objectcodes.c
+	"headers.h"
+	"stdlib.h"
+
+1638235779 source:d:\downloads\unf\fall 2021\system software\syssoft project 4\main.c
+	"headers.h"
+
+1637798209 source:d:\documents\github\sic-xe-assembler\brents-branch\directives.c
+	"headers.h"
+
+1638520663 d:\documents\github\sic-xe-assembler\brents-branch\headers.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1638227127 source:d:\documents\github\sic-xe-assembler\brents-branch\symbols.c
+	"headers.h"
+
+1638693072 source:d:\documents\github\sic-xe-assembler\brents-branch\instructions.c
+	"headers.h"
+
+1638780791 source:d:\documents\github\sic-xe-assembler\brents-branch\objectcodes.c
+	"headers.h"
+	"stdlib.h"
+
+1638781256 source:d:\documents\github\sic-xe-assembler\brents-branch\main.c
+	"headers.h"
+
+1637798209 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\directives.c
+	"headers.h"
+
+1638520663 c:\users\brent\desktop\sic-xe-assembler\brents-branch\headers.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1638781256 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\main.c
+	"headers.h"
+
+1638836605 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\objectcodes.c
+	"headers.h"
+	"stdlib.h"
+
+1638836598 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\symbols.c
+	"headers.h"
+
+1638836580 source:c:\users\brent\desktop\sic-xe-assembler\brents-branch\instructions.c
+	"headers.h"
+
