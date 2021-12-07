@@ -187,6 +187,13 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
                 //p is 0 if b is 1
                 strcat(tempObjectcode, "0");
             }
+            else if(strcmp(instr, "BASE") == 0)////////////////////////////////////////////////////////////////////////////////ADDED
+            {
+                //below handles b 
+                strcat(tempObjectcode, "1"); //b is used if it is outside -2048 - 2047
+                //p is 0 if b is 1
+                strcat(tempObjectcode, "0");
+            }
             else
             {
                 //b is 0 and p is 1
