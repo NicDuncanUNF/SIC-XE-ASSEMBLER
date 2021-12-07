@@ -47,15 +47,16 @@ Max SIC-XE program size: 2^20 bytes, or 0x100000 bytes
 Maximum Symbol Table size:
 Max T records:
 Max M records:
-Will only output object code a SICXE machine can utilize.
+Will only output object code a SICXE machine can utilize. Programs cannot be used by SIC machines.
 
 =====Current Issues=====
 Pass 1: 
 Pass 2: 
-Format 1, does not generate the correct opcode.
+Format 1, does not generate the correct opcode yet.
 Hits errors when creating object code.
 Overall:
 Clean up git repository of all compiler related and unneeded files and folders.
+Powerpoint presentation.
 
 =====Presenation Notes=====
 language and tools used
