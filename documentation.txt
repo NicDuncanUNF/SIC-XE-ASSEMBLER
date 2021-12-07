@@ -1,0 +1,69 @@
+=====Summary=====
+Created by Nic Duncan, Paul Davis, Brent Melby, and Kaitlyn Turner
+This program is an assembler that creates object code for the SIC-XE assembly language.
+
+=====headers.h=====
+Used to initialize all functions and libraries used throughout the program.
+
+=====directives.c=====
+isADirective: Used to check if an inserted string matches a known system directive.
+
+=====symbols.c=====
+IsAValidSymbol: Checks an inputted symbol against SIC-XE criteria.
+symbolExists: Searches a symbol table to make sure matching symbol does not exist already.
+addSymbol: Finds the next free slot in the symbol table and inserts the validated symbol.
+
+=====instructions.c=====
+getOpcode: gets an equivalent opcode from a given instruction.
+IsAnInstruction: Returns a boolean if the given string is a valid instruction or not.
+getInstrMovement: Returns the byte movement/format a given instruction uses.
+
+=====objectcodes.c=====
+generateObjectcode: takes in instruction, token, location of insttruction, and location of next instruction. Determines format of instruction and returns object code for instruction
+and length separated by a coma for use in main function. EX. ABCDEF,03
+hexToBin: Converts a hexedecimal input to binary.
+binToHex: Converts a binary input to hexedecimal.
+
+=====main.c=====
+main: Where pass 1 and pass 2 reside.
+updateLocation: Gets the location counter movement from each line.
+chopPrefix: Removes a prefix character such as +, #, or @ from a given input.
+
+
+=====Error handling=====
+Pass 1:
+No empty lines present in the file
+Ensuring the program does not exceed the SIC-XE memory limit of 2^20 bytes or 0x100000 bytes.
+Validating that symbols meet SIC-XE's specifications such as starting with appropriate characters or being in all capital characters.
+Watch for duplicate symbol creation.
+
+
+Pass 2:
+Check that valid symbol is referened by format 3 instructions.
+Ensure that valid instructions and directives are used.
+
+=====Limitations=====
+Max SIC-XE program size: 2^20 bytes, or 
+Maximum Symbol Table size:
+Max T records:
+Max M records:
+
+=====Current Issues=====
+Pass 1: 
+Pass 2: 
+Format 1, does not generate the correct opcode.
+Hits errors when creating object code.
+Overall:
+Clean up git repository of all compiler related and unneeded files and folders.
+
+=====Presenation Notes=====
+language and tools used
+goal of project
+Overview of logic flow and designn choices
+Show documentation (Create man page?)
+Error control methods
+Changes needed in order to process SICXE code
+Things we could have done better/ Issues
+Lessons learned (Communication, Coordination, Git, )
+Asymptotic Runtime/Efficiency
+Conclusions/Questions
