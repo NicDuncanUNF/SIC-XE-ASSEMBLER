@@ -47,7 +47,8 @@ int symbolExists(struct symbol* Tab[], char* sName){
 	}//end while
 
 	return result;
-}
+}//end function
+
 
 //function for adding a symbol to a function table
 void addSymbol(struct symbol* Tab[], int addr, int src, char* symName){

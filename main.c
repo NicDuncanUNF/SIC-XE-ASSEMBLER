@@ -2,8 +2,8 @@
 //Preprocessor variables
 //maximum PC reach in pass 2 is about 2100 bytes, document and/or find true number
 #define MAX_PC_REACH 2100
-//max sic xe memory in hex
-#define MAX_SICXE_MEMORY 10000
+//max sic xe memory in hex represented as a string
+#define MAX_SICXE_MEMORY "100000"
 #define MAXTRECORDS 1000
 #define MAXMRECORDS 1000
 
@@ -60,6 +60,11 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}
+		//if the line is empty
+		if(line == NULL){
+			printf("\nERROR: \n\n%s\nLine %d, Line is empty.\n\n", fullline, lineNum);
+		}//end if
+		
 		//For lines with symbols
 		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
 
@@ -79,13 +84,13 @@ int main( int argc, char* argv[]){
                                 printf("\nERROR:\n\n%s\nLine %d, Symbol with an instruction name.\n\n", fullline, lineNum);
                                 fclose(fp);
                                 return 0;
-                        }
+            }//end if
 			//edit error format
 			if ( IsAValidSymbol(newsym) == 0 ) {
 				printf("\nERROR:\n\n%s\nLine %d, Invalid symbol found.\n\n", fullline, lineNum);
                                 fclose(fp);
                                 return 0;
-                        }
+            }//end if
 			//symbol has valid length, error check 9
 			else{
 				for(int i = 0; i < strlen(newsym); i++){
@@ -122,6 +127,7 @@ int main( int argc, char* argv[]){
 					thirdToken = strtok(NULL, " \r\t\n");
 					//error check 5
 					int maxMem = strtol("100000", NULL, 16);
+					//check if the new location counter exceeds max memory value
 					if(strtol(thirdToken, NULL, 16) >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, SIC program starts outside of memory.\n\n", fullline, lineNum);
 						fclose(fp);
@@ -149,7 +155,7 @@ int main( int argc, char* argv[]){
 					loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
 					loArr[loEle] = loCounter;
                     loEle++;
-					//check test 10 after every usage of  update location
+					//check if the new location counter exceeds max memory value
 					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);

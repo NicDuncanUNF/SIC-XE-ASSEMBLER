@@ -52,6 +52,7 @@ Will only output object code a SICXE machine can utilize. Programs cannot be use
 =====Current Issues=====
 Pass 1: 
 Pass 2: 
+B bit needs to be flipped by BASE instruction
 Format 1, does not generate the correct opcode yet.
 Hits errors when creating object code.
 Overall:
