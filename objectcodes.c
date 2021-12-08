@@ -1,9 +1,13 @@
 //Generates and returns object code for all formats (1-4), which will later be appended to end of T records
 #include "headers.h"
 #include "stdlib.h"
+#include "stdbool.h"
 
-char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue)//function will handle formats 1, 2, 3, and 4 for sic xe
+char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue, int base)//function will handle formats 1, 2, 3, and 4 for sic xe
 {
+    //char * hexToBin(char value); //will remove
+    //char binToHex(char *bin);//will remove
+
     char buff[1024];
     if(token == NULL) //format 1, where object code = 'OPcode' (e.g. C0)
     {
@@ -12,6 +16,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         strcpy(finalObjectcode, buff); //stores opcode
         strcat(finalObjectcode, ",01");//adds the length
         return finalObjectcode;
+
     }//end if
     else if((token[0] == 'A') ||
     (token[0] == 'X') ||
@@ -20,6 +25,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
     (token[0] == 'S') ||
     (token[0] == 'T') ||
     (token[0] == 'F')) //format 2, where object code = 'OPcode + register 1 + register 2' (e.g. B404)
+
     {
         char *finalObjectcode = malloc(7 * sizeof(char)); //will store final object code
         char *registers[2];//will store register values
@@ -62,25 +68,47 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
             {
                 return "-2";
             }
-        }//end for loop
+        }//end of for loop
         if(registers[1] == NULL)//if there is only 1 register, the second is 0
         {
             strcat(finalObjectcode, "0");
-        }//end if
+        }
         strcat(finalObjectcode, ",02");//adds the length
         return finalObjectcode;
-    }//end else if
+    }
+
     else if(instr[0] == '+') //format 4
     {
         char *tempObjectcode = malloc(33 * sizeof(char)); //will store the binary
         char *finalObjectcode = malloc(12 * sizeof(char)); //will store final object code
+
+        char *registers[2];//will store register values
         snprintf(buff, sizeof(buff), "%02X", getOpcode(instr) & 0xff); //gets opcode
         strcpy(tempObjectcode, hexToBin(buff[0]));//converts first hex opcode to binary and stores
+
         strncat(tempObjectcode, hexToBin(buff[1]), 2); //converts second hex value in opcode to binary and stores
          //n and i are 1s for format 4
         strcat(tempObjectcode, "11");
 
         //below handles x
+
+         for(int i = 0; i < strlen(token); i++)
+        {
+            if(token[i] == ',')
+            {
+                 registers[0] = strtok(token, " ,\r\t\n"); //register 1
+                 registers[1] = strtok(NULL, " ,\r\t\n"); //register 2
+                 if(strcmp(registers[1], "X") == 0)
+                 {
+                     strcat(tempObjectcode, "1"); //x is 1
+                 }
+            }
+        }
+        if(registers[0] == NULL)
+        {
+            strcat(tempObjectcode, "0"); //x is 0
+        }
+
 
         //b and p are 0 for format 4
         strcat(tempObjectcode, "00");
@@ -106,15 +134,19 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         strcat(finalObjectcode, ",04");//adds the length
 
         return finalObjectcode;
+
     }//end format 4
+
     else //format 3
     {
         char *registers[2];//will store register values
         char *tempObjectcode = malloc(25 * sizeof(char));//will store the binary
         char *finalObjectcode = malloc(10 * sizeof(char)); //will store final object code
         snprintf(buff, sizeof(buff), "%02X", getOpcode(instr) & 0xff); //gets opcode
+
         strcpy(tempObjectcode, hexToBin(buff[0]));//converts first hex opcode to binary and stores
         strncat(tempObjectcode, hexToBin(buff[1]), 2); //converts second hex value in opcode to binary and stores
+
         //below handles n and i
         if(token[0] == '#')//for immediate addressing
         {
@@ -155,17 +187,23 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         {
             if((token[0] == '#') || (token [0] == '@'))
             {
+
                 //below handles b
+
                 strcat(tempObjectcode, "0"); //b is 0 for this regardless
                 //p is 0 if the pc counter is not used
                 strcat(tempObjectcode, "0");//converts first hex opcode to binary and stores
                 //below handles e
+
                 strcat(tempObjectcode, "0");
+
 
                 strcat(tempObjectcode, "0000");
                 for(int i = 1; i < strlen(token); i++) //goes through every number and gets binary, bin is stored in tempObjectcode
                 {
+
                     strcat(tempObjectcode, hexToBin(token[i]));//converts first hex opcode to binary and stores
+
                 }
             }
             else //unacceptable operand address
@@ -175,30 +213,63 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         }
         else //operand is acceptable
         {
-            int dis = operandAdd - nextPCValue; //gets displacement
-            if(dis > 2047 || dis < -2048)
+
+           int dis = operandAdd - nextPCValue; //gets displacement
+
+            if(base == 1)//if BASE directive is in affect
             {
-                //below handles b
-                strcat(tempObjectcode, "1"); //b is used if it is outside -2048 - 2047
-                //p is 0 if b is 1
-                strcat(tempObjectcode, "0");
+                if(dis < 0 && dis >= -2048)
+                {
+                    //b is 0 is the displacement is negative
+                    strcat(tempObjectcode, "0");
+                    //p is 1
+                    strcat(tempObjectcode, "1");
+                }
+                else if(dis > 4095 || dis < -2048)//out of bounds regardless
+                {
+                    return "-1";
+                }
+                else
+                {
+                    //below handles b
+                    strcat(tempObjectcode, "1"); //b is used if it is outside -2048 - 2047
+                    //p is 0 if b is 1
+                    strcat(tempObjectcode, "0");
+                }
             }
             else
             {
-                //b is 0 and p is 1
-                strcat(tempObjectcode, "0");
-                //p is 1
-                strcat(tempObjectcode, "1");
+                if(dis > 2047 && dis <= 4095)//if out of bounds for PC, used base
+                {
+                    //below handles b
+                    strcat(tempObjectcode, "1"); //b is used if it is outside PC bounds
+                    //p is 0 if b is 1
+                    strcat(tempObjectcode, "0");
+                }
+                else if(dis > 4095 || dis < -2048)
+                {
+                    return "-1";
+                }
+                else//default is PC relative
+                {
+                    //b is 0 and p is 1
+                    strcat(tempObjectcode, "0");
+                    //p is 1
+                    strcat(tempObjectcode, "1");
+                }
             }
             //below handles e
             strcat(tempObjectcode, "0");
 
+
             snprintf(buff, sizeof(buff), "%02X", dis); //stores as hex
             for(int i = 0; i < strlen(buff); i++) //goes through every number and gets binary, bin is stored in tempObjectcode
             {
+
                 strcat(tempObjectcode, hexToBin(buff[i]));//converts first hex opcode to binary and stores
             }
         }
+
 
         int current = 0;//current place in tempObjectcode
         char *currentBinary = malloc(5 * sizeof(char)); //will store current binary being converted

@@ -68,7 +68,7 @@
 1637798209 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\directives.c
 	"headers.h"
 
-1638930706 d:\documents\github\sic-xe-assembler\sic-xe-assembler\headers.h
+1638993293 d:\documents\github\sic-xe-assembler\sic-xe-assembler\headers.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -80,7 +80,7 @@
 	"headers.h"
 	"stdlib.h"
 
-1638933791 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
+1638934057 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
 	"headers.h"
 
 1638846415 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\main.c

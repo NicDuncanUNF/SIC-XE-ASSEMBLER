@@ -27,6 +27,8 @@ int main( int argc, char* argv[]){
 	int loArr[1024];
 	//index of loArr array
 	int loEle = 0;
+	//Boolean for BASE(0)/DEBASE(1) operation, done in generateObjectcode
+	int isBase = 0;
 
 	if ( argc != 2 ) {
 	printf("ERROR: Usage: %s filename\n", argv[0]);
@@ -545,12 +547,12 @@ int main( int argc, char* argv[]){
                 if(symbolExists(SymbolTable, oper) == 0)
                 {
                     printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
-                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
+                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
                 }
                 else
                 {
                     printf("\ngenObjAppend\n");
-                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
                 }
 
                 //Error checking
@@ -618,11 +620,11 @@ int main( int argc, char* argv[]){
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
                 if(symbolExists(SymbolTable, oper) == 0)
                 {
-                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
+                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
                 }
                 else
                 {
-                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
+                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
                 }
 
                 //Error checking
