@@ -200,23 +200,25 @@ int main( int argc, char* argv[]){
 				loArr[loEle] = loCounter;
                 loEle++;
 				int maxMem = strtol("100000", NULL, 16);
-                                if(loCounter >= maxMem){
-                                	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
-                                        fclose(fp);
-                                        return 0;
-                                }//end if
+
+                if(loCounter >= maxMem){
+                    printError("Program exceeded memory");
+                    fclose(fp);
+                    return 0;
+                }//end if
+
 			}//end else if
 			//if none of the above are triggered, the middle token is an invalid directive or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
                     printError("INVALID DIRECTIVE FOUND, ERROR ONE");//TODO Fix error code
-                                	fclose(fp);
-                                	return 0;
+                    fclose(fp);
+                    return 0;
 				}//end if
 				else{
-					printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
-                                        fclose(fp);
-                                        return 0;
+					printError("INVALID INSTRUCTION FOUND");
+                    fclose(fp);
+                    return 0;
 				}//end else
 			}//end else
 
@@ -404,6 +406,7 @@ int main( int argc, char* argv[]){
             hRec = strcat(hRec, buff);
             //printf("\n\n%s\n",hRec);
             //printf("Start location: %X\n", loArr[i]);
+            printf("H record created\n");
             continue;
         }//end if
         //directive word (t record)
@@ -511,29 +514,51 @@ int main( int argc, char* argv[]){
         }//end else if
         //directive end (e record)
         else if(strcmp(dirInst, "END") == 0){
+            tokThird = strtok( NULL, " ,'\r\t\n");
+            printf("Reached END directive, with tokThird |%s|\n", tokThird);
             strcat(eRec, "E");
-            tokThird = strtok( NULL, "'\r\t\n");
-                            char buff[1024];
+            printf("After strcat E\n");
+            char buff[1024];
             int j = 0;
+
             while(SymbolTable[j+1] != NULL){
-                if(strcmp(SymbolTable[j]->Name, tokThird) == 0){
-                    break;
-                }
+                if(strcmp(SymbolTable[j]->Name, tokThird) == 0)
+                    {break;}
                 j++;
             }
+
             if(SymbolTable[j+1] == NULL){
-                printError("Label was not found in Symbol Table, ONE");
-                printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
-                fclose(fp);
-                exit(0);
+                printf("After strcat E\n");
+                char buff[1024];
+                j = 0;
+
+                printf("Before symbol search\n");
+
+                //Search symbol for END's operand, which specifies the first executable instruction
+                //Once found in symbol table,
+                while(SymbolTable[j+1] != NULL){
+                    if(strcmp(SymbolTable[j]->Name, tokThird) == 0)
+                        {break;}
+                    j++;
+                }
+
+                printf("After symbol search\n");
+
+                if(SymbolTable[j+1] == NULL){
+                    printError("Label was not found in Symbol Table, ERROR ONE");
+                    printf("Label: |%s|\n", tokThird);
+                    fclose(fp);
+                    exit(0);
+                }
+
+                snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
+                strcat(eRec, buff);
+
+                continue;
             }
-                            snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
-                            strcat(eRec, buff);
-            //printf("End record:\n");
-                            //printf("%s\n",eRec);
-            //printf("End location: %X\n", loArr[i]);
-            i++;
-                            continue;
+            snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
+            strcat(eRec, buff);
+            continue;
         }
         //BASE does not generate T records, but does flip a boolean that affects future T records
         else if(strcmp(dirInst, "BASE") == 0){
@@ -575,7 +600,8 @@ int main( int argc, char* argv[]){
 
             //Error checking
             if (strcmp(genObjAppend, "-1") == 0){
-                printError("Label was not found in Symbol Table, TWO");
+                printError("Label was not found in Symbol Table, ERROR TWO");
+                printf("Label: |%s|\n", tokThird);
                 fclose(fp);
                 exit(0);
             }//end if
@@ -650,23 +676,26 @@ int main( int argc, char* argv[]){
 
         //Print t records
         for(int j=0; j<i;j++){
-            if(tRec[j][0] != 'T'){
-                continue;
-            }
+
+            if(tRec[j][0] != 'T')
+                {continue;}
+
             fprintf(fp, "%s\n",tRec[j]);
         }
 
         //Print m records
         for(int k=0; k<i;k++){
-            if(mRec[k][0] != 'M'){
-                            continue;
-                    }
-                    fprintf(fp, "%s\n",mRec[k]);
-            }
+
+            if(mRec[k][0] != 'M')
+                {continue;}
+
+            fprintf(fp, "%s\n",mRec[k]);
+        }
 
         //Print e record
         fprintf(fp, "%s\n",eRec);
 
+        printf("\nOBJECT FILE CREATED!\n");
         //close file
         fclose( fp );
 

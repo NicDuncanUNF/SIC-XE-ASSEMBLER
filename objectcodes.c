@@ -18,13 +18,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         return finalObjectcode;
 
     }//end if
-    else if((token[0] == 'A') ||
-    (token[0] == 'X') ||
-    (token[0] == 'L') ||
-    (token[0] == 'B') ||
-    (token[0] == 'S') ||
-    (token[0] == 'T') ||
-    (token[0] == 'F')) //format 2, where object code = 'OPcode + register 1 + register 2' (e.g. B404)
+    else if(getInstrMovement(instr) == 2)  //format 2, where object code = 'OPcode + register 1 + register 2' (e.g. B404)
 
     {
         char *finalObjectcode = malloc(7 * sizeof(char)); //will store final object code
