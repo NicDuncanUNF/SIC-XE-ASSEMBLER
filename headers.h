@@ -44,6 +44,6 @@ int IsAnInstruction (char* Instr);
 int getInstrMovement(char* Instr);
 
 //Functions from objectcodes.c
-char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue);
+char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue, bool base);
 char * hexToBin(char value);
 char binToHex(char *bin);
