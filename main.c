@@ -49,47 +49,64 @@ int main( int argc, char* argv[]){
 	memset( thirdToken, '\0', 1024 * sizeof(char)          );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
 
+	//Used in condition code for if-else statements pertaining to what type of line is being read
+	int lineCondition = 0;
+
 	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
-        printf("Line: %s\n", line);
+        //Increment the counter for current line being read
+        lineNum++;
+
+        printf("Line: %s", line);
 		strcpy( fullline, line );
 		if ( line[0] == 35) {
 			//printf("COMMENT:%s", line );
-			lineNum++;
-
 			continue;
 		}
+
 		//if the line is empty
 		if(line == NULL){
-			printf("\nERROR: \n\n%s\nLine %d, Line is empty.\n\n", fullline, lineNum);
+            printError("Line is empty");
+			fclose(fp);
+            return 0;
 		}//end if
+		//If line contains an invalid symbol or formatting
+        if (!( ((line[0] >= 65) && (line[0] <= 90)) || (line[0] == 9) || (line[0] == 32))){
+            printError("Invalid symbol or formatting");
+            fclose(fp);
+            return 0;
+        }
+        //If line contains a symbol
+        if ((line[0] >= 65 ) && (line[0] <= 90))
+            {lineCondition = 1;}
+        //Line does not contain a symbol
+        if (line[0] == 9 || line[0] == 32)
+            {lineCondition = 2;}
+
 
 		//For lines with symbols
-		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
-
-			//increment the current line we are reading on the file
-			lineNum++;
+		if (lineCondition == 1){
 			//get the symbol
 			newsym = strtok( line, " \r\t\n");
 
 			//check if the symbol is a system directive
 			if(IsADirective(newsym) == 1){
-				printf("\nERROR:\n\n%s\nLine %d, Symbol with a directive name.\n\n", fullline, lineNum);
+                printError("Symbol with a directive name.");
 				fclose(fp);
 				return 0;
 			}
 			//symbol has instruction name check
 			if(IsAnInstruction(newsym) == 1){
-                                printf("\nERROR:\n\n%s\nLine %d, Symbol with an instruction name.\n\n", fullline, lineNum);
-                                fclose(fp);
-                                return 0;
+			    printError("Symbol with an instruction name.");
+                fclose(fp);
+                return 0;
             }//end if
 			//edit error format
 			if ( IsAValidSymbol(newsym) == 0 ) {
-				printf("\nERROR:\n\n%s\nLine %d, Invalid symbol found.\n\n", fullline, lineNum);
-                                fclose(fp);
-                                return 0;
+			    printError("Invalid symbol found.");
+                fclose(fp);
+                return 0;
             }//end if
 			//symbol has valid length, error check 9
 			else{
@@ -190,7 +207,7 @@ int main( int argc, char* argv[]){
 			//if none of the above are triggered, the middle token is an invalid directive or instruction.
 			else{
 				if(IsADirective(nextoken) == 0){
-					printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: %d ERROR ONE\n\n", lineNum);//TODO Fix error code
+                    printError("INVALID DIRECTIVE FOUND, ERROR ONE");//TODO Fix error code
                                 	fclose(fp);
                                 	return 0;
 				}//end if
@@ -204,66 +221,66 @@ int main( int argc, char* argv[]){
 
 			continue;
 		}//end if
-		//if the
-		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
+		//For lines without symbols
+		else if(lineCondition == 2){
             printf("\n\nNON-SYMBOL LINE\n\n");
-			lineNum++;
 			nextoken = strtok( line, " \t\n"  );
 			//printf("\nFULL LINE:%s", fullline );
-                        //printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
+            //printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
 			if(IsADirective(nextoken) == 1){
-                                //printf("%s is a valid directive.\n\n", nextoken);
-                                //if else branch of directives for location counter movement
-								//error check 10
-								//printf("\n\nLINE 211\n\n");
-								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-								loArr[loEle] = loCounter;
-                                loEle++;
-								int maxMem = strtol("100000", NULL, 16);
-                                if(loCounter >= maxMem){
-                                	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
-                                        fclose(fp);
-                                        return 0;
-                                }//end if
+                //printf("%s is a valid directive.\n\n", nextoken);
+                //if else branch of directives for location counter movement
+                //error check 10
+                //printf("\n\nLINE 211\n\n");
+                loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+                loArr[loEle] = loCounter;
+                loEle++;
+                int maxMem = strtol("100000", NULL, 16);
+                if(loCounter >= maxMem){
+                    printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
+                    fclose(fp);
+                    return 0;
+                }//end if
 			}//end if
-                        else if(IsAnInstruction(nextoken) == 1){
-                                //printf("%s is a valid instruction.\n\n", nextoken);
-                                //move location counter by 3bytes
-								//error check 10
-								//printf("\n\nLINE 226\n\n");
-								loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
-								loArr[loEle] = loCounter;
-                                loEle++;
-								int maxMem = strtol("100000", NULL, 16);
-                                if(loCounter >= maxMem){
-                                	printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
-                                        fclose(fp);
-                                        return 0;
-                                }
-                        }//end else if
-                        else{
-                                if(IsADirective(nextoken) == 0){
-										printf("%s",nextoken);
-                                        printf("\nERROR. INVALID DIRECTIVE FOUND ON LINE: ERROR TWO%d\n\n", lineNum);//TODO FIX ERROR CODE
-                                        fclose(fp);
-                                        return 0;
-                                }//end if =
-                                else{
-                                        printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
-                                        fclose(fp);
-                                        return 0;
-                                }//end else
-                        }//end else
+            else if(IsAnInstruction(nextoken) == 1){
+                //printf("%s is a valid instruction.\n\n", nextoken);
+                //move location counter by 3bytes
+                //error check 10
+                //printf("\n\nLINE 226\n\n");
+                loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+                loArr[loEle] = loCounter;
+                loEle++;
+                int maxMem = strtol("100000", NULL, 16);
+                if(loCounter >= maxMem){
+                    printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
+                    fclose(fp);
+                    return 0;
+                }
+            }//end else if
+            else{
+                if(IsADirective(nextoken) == 0){
+                    printf("|%s|\n",nextoken);
+                    printError("INVALID DIRECTIVE FOUND, ERROR TWO");//TODO FIX ERROR CODE
+                    fclose(fp);
+                    return 0;
+                }//end if =
+                else{
+                    printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
+                    fclose(fp);
+                    return 0;
+                }//end else
+            }//end else
 			continue;
 		}//end else if
 		//if the line is blank, error out
-		else if(line[0] == '\n' || line[0] == '\r' || line[0] == '\t'){
+		else{
 			printf("\nERROR:\n\n%s\nLine %d, Blank line found.\n\n", fullline, lineNum+1);
 			fclose(fp);
 			return 0;
 		}//end else if
 
 
+		printf("\n-----\nPASS 1 DONE\n-----\n");
 
 		//printf("%s", line );
 
@@ -277,12 +294,12 @@ int main( int argc, char* argv[]){
 	}
 
 	//print symbol table
-//	printf("Symbol Table:\n");
-//	int i = 0;
-//	while(SymbolTable[i+1] != NULL){
-//		printf("%s\t%X\n",SymbolTable[i]->Name,SymbolTable[i]->Address);
-//		i++;
-//	}//end while
+	printf("Symbol Table:\n");
+	int symIndex = 0;
+	while(SymbolTable[symIndex+1] != NULL){
+		printf("%s\t%X\n",SymbolTable[symIndex]->Name,SymbolTable[symIndex]->Address);
+		symIndex++;
+	}//end while
 
 		//--------set up location counter with valid increments
 		//--------create symbol array (learn about type def struct)
@@ -321,6 +338,7 @@ int main( int argc, char* argv[]){
 	memset( eRec, '\0', 1024 * sizeof(char) );
 
 	rewind(fp);
+    lineNum = 0;
 
 	//variable to keep track of t records
 	int i = 0;
@@ -340,6 +358,11 @@ int main( int argc, char* argv[]){
 	memset( sizeAppend, '\0', 1024 * sizeof(char) );
 
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
+
+        //Increment the counter for current line being read
+        lineNum++;
+        //Copy line into fullline for error messages
+        strcpy( fullline, line );
 
 		//If line is a comment
 		if ( line[0] == 35) {
@@ -488,6 +511,7 @@ int main( int argc, char* argv[]){
 					j++;
 				}
 				if(SymbolTable[j+1] == NULL){
+                    printError("Label was not found in Symbol Table, ONE");
 					printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
 					fclose(fp);
 					exit(0);
@@ -518,23 +542,25 @@ int main( int argc, char* argv[]){
                 strcat(tRec[i], buff);
 
                 //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-                if(symbolExists(SymbolTable, oper) == -1)
+                if(symbolExists(SymbolTable, oper) == 0)
                 {
+                    printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                     genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
                 }
                 else
                 {
+                    printf("\ngenObjAppend\n");
                     genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]));
                 }
 
                 //Error checking
                 if (strcmp(genObjAppend, "-1") == 0){
-                    printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                    printError("Label was not found in Symbol Table, TWO");
                     fclose(fp);
                     exit(0);
                 }//end if
                 if (strcmp(genObjAppend, "-2") == 0){
-                    printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
+                    printError("nInvalid register");
                     fclose(fp);
                     exit(0);
                 }//end if
@@ -590,7 +616,7 @@ int main( int argc, char* argv[]){
             strcat(tRec[i], buff);
 
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-                if(symbolExists(SymbolTable, oper) == -1)
+                if(symbolExists(SymbolTable, oper) == 0)
                 {
                     genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]));
                 }
@@ -601,7 +627,7 @@ int main( int argc, char* argv[]){
 
                 //Error checking
                 if (strcmp(genObjAppend, "-1") == 0){
-                    printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                    printError("Label was not found in Symbol Table, THREE");
                     fclose(fp);
                     exit(0);
                 }//end if

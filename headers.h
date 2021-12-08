@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define printError(specError)     printf("ASSEMBLY ERROR ON LINE %d:\n\n%s\n%s\n", lineNum, fullline, specError)
+
 struct symbol {
 	int	DefinedOnSourceLine;
 	int	Address;
