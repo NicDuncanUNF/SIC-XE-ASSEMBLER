@@ -1,8 +1,9 @@
 //will be used for generating objectcodes for format 2, 3, and 4 for TRecords
 #include "headers.h"
 #include "stdlib.h"
+#include "stdbool.h"
 
-char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue)//function will handle formats 1, 2, 3, and 4 for sic xe
+char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue, bool base)//function will handle formats 1, 2, 3, and 4 for sic xe
 {
     //char * hexToBin(char value); //will remove
     //char binToHex(char *bin);//will remove
@@ -77,6 +78,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
     {
         char *tempObjectcode = malloc(33 * sizeof(char)); //will store the binary
         char *finalObjectcode = malloc(12 * sizeof(char)); //will store final object code
+        char *registers[2];//will store register values
         snprintf(buff, sizeof(buff), "%02X", getOpcode(instr) & 0xff); //gets opcode
         strcpy(tempObjectcode, hexToBin(buff[0]));//converts first hex opcode to binary and stores 
         strncat(tempObjectcode, hexToBin(buff[1]), 2); //converts second hex value in opcode to binary and stores
@@ -84,6 +86,22 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         strcat(tempObjectcode, "11");
 
         //below handles x
+         for(int i = 0; i < strlen(token); i++)
+        {
+            if(token[i] == ',')
+            {
+                 registers[0] = strtok(token, " ,\r\t\n"); //register 1
+                 registers[1] = strtok(NULL, " ,\r\t\n"); //register 2
+                 if(strcmp(registers[1], "X") == 0)
+                 {
+                     strcat(tempObjectcode, "1"); //x is 1
+                 }
+            }
+        }
+        if(registers[0] == NULL)
+        {
+            strcat(tempObjectcode, "0"); //x is 0
+        }
 
         //b and p are 0 for format 4
         strcat(tempObjectcode, "00");
@@ -178,20 +196,49 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         }
         else //operand is acceptable
         {
-            int dis = operandAdd - nextPCValue; //gets displacement
-            if(dis > 2047 || dis < -2048)
+           int dis = operandAdd - nextPCValue; //gets displacement
+
+            if(base != false)//if BASE directive is in affect
             {
-                //below handles b 
-                strcat(tempObjectcode, "1"); //b is used if it is outside -2048 - 2047
-                //p is 0 if b is 1
-                strcat(tempObjectcode, "0");
+                if(dis < 0 && dis >= -2048)
+                {
+                    //b is 0 is the displacement is negative
+                    strcat(tempObjectcode, "0"); 
+                    //p is 1 
+                    strcat(tempObjectcode, "1");
+                }
+                else if(dis > 4095 || dis < -2048)//out of bounds regardless
+                {
+                    return "-1";
+                }
+                else
+                {
+                    //below handles b 
+                    strcat(tempObjectcode, "1"); //b is used if it is outside -2048 - 2047
+                    //p is 0 if b is 1
+                    strcat(tempObjectcode, "0");
+                }
             }
             else
             {
-                //b is 0 and p is 1
-                strcat(tempObjectcode, "0"); 
-                //p is 1 
-                strcat(tempObjectcode, "1");
+                if(dis > 2047 && dis <= 4095)//if out of bounds for PC, used base
+                {
+                    //below handles b 
+                    strcat(tempObjectcode, "1"); //b is used if it is outside PC bounds
+                    //p is 0 if b is 1
+                    strcat(tempObjectcode, "0");
+                }
+                else if(dis > 4095 || dis < -2048)
+                {
+                    return "-1";
+                }
+                else//default is PC relative
+                {
+                    //b is 0 and p is 1
+                    strcat(tempObjectcode, "0"); 
+                    //p is 1 
+                    strcat(tempObjectcode, "1");
+                }
             }
             //below handles e
             strcat(tempObjectcode, "0"); 
