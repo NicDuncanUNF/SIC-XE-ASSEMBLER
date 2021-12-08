@@ -76,9 +76,10 @@
 1638857672 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\instructions.c
 	"headers.h"
 
-1638836605 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\objectcodes.c
+1638994651 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\objectcodes.c
 	"headers.h"
 	"stdlib.h"
+	"stdbool.h"
 
 1638934057 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
 	"headers.h"

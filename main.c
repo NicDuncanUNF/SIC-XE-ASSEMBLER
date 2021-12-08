@@ -27,7 +27,7 @@ int main( int argc, char* argv[]){
 	int loArr[1024];
 	//index of loArr array
 	int loEle = 0;
-	//Boolean for BASE(0)/DEBASE(1) operation, done in generateObjectcode
+	//Boolean for BASE(0)/NOBASE(1) operation, done in generateObjectcode
 	int isBase = 0;
 
 	if ( argc != 2 ) {
@@ -366,249 +366,193 @@ int main( int argc, char* argv[]){
         //Copy line into fullline for error messages
         strcpy( fullline, line );
 
+        //TODO remove debug print statements
+        printf("Line number: %d\n", lineNum);
+        printf("T record number: %d\n", i);
+        printf("Line: %s\n\n", fullline);
+
 		//If line is a comment
 		if ( line[0] == 35) {
 			continue;
 		}//end if
-
-		//If line starts with a symbol/label
-		if (  (line[0] >= 33 ) && ( line[0] <= 90 )   )  {
-
+		//If line contains a symbol
+        if ((line[0] >= 65 ) && (line[0] <= 90)){
             //Skip symbol part of line
 			strtok( line, " \r\t\n");
-			//Store directive/instruction to dirInst
-			dirInst = strtok( NULL, " \r\t\n");
-
-			//directive start (header record)
-			if(strcmp(dirInst, "START") == 0){
-				hRec = strcat(hRec, "H");
-				hRec = strcat(hRec, SymbolTable[0]->Name);
-				char* extraSpace = "      ";
-				hRec = strncat(hRec, extraSpace, (6 - strlen(SymbolTable[0]->Name)));
-				char buff[1024];
-				snprintf(buff, sizeof(buff), "%06X", SymbolTable[0]->Address);
-				hRec = strcat(hRec, buff);
-				snprintf(buff, sizeof(buff), "%06X", proLen);
-				hRec = strcat(hRec, buff);
-				//printf("\n\n%s\n",hRec);
-				//printf("Start location: %X\n", loArr[i]);
-				continue;
-			}//end if
-
-			//directive word (t record)
-			else if(strcmp(dirInst, "WORD") == 0){
-				strcat(tRec[i], "T");
-				char buff[1024];
-				snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-				strcat(tRec[i], buff);
-				//length of word
-				strcat(tRec[i], "03");
-				tokThird = strtok( NULL, "\r\t\n");
-				int wordNum = atoi(tokThird);
-				snprintf(buff, sizeof(buff), "%06X",wordNum);
-				strcat(tRec[i], buff);
-				//printf("Word record:\n");
-				//printf("%s\n",tRec[i]);
-				//printf("Word location: %X\n", loArr[i]);
-				i++;
-				continue;
-			}//end else if
-			//directive byte (t record)
-			else if(strcmp(dirInst, "BYTE") == 0){
-
-				strcat(tRec[i], "T");
-				char buff[1024];
-                                snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-				strcat(tRec[i], buff);
-				char* XorC = strtok( NULL, "'\r\t\n");
-				if(strcmp(XorC, "C") == 0){
-					tokThird = strtok( NULL, "'\r\t\n");
-					//printf("\n\n%s\n\n", tokThird);
-					//int stringLen = strlen(tokThird);
-					//snprintf(buff, sizeof(buff), "%02X", stringLen);
-					//strcat(tRec[i], buff);
-					int j = 0;
-					/*while(strlen(tRec[i]) > 69){
-						snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
-                                                strcat(tRec[i], buff);
-                                                j++;
-					}
-					*/
-					char* text = malloc(1024 * sizeof(char));
-					memset( text, '\0', 1024 * sizeof(char) );
-					while(strlen(text) < 60){
-						if(tokThird[j] == '\0'){
-							break;
-						}
-                                                snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
-                                                strcat(text, buff);
-                                                j++;
-                                        }
-					int textLen = (strlen(text) / 2);
-					snprintf(buff, sizeof(buff), "%02X", textLen);
-					strcat(tRec[i], buff);
-					snprintf(buff, sizeof(buff), "%s", text);
-					strcat(tRec[i], buff);
-					//printf("\n\nj is equal to: %d\n\n",j);
-					//printf("Byte C record:\n");
-					//printf("%s\n",tRec[i]);
-					//if there was a cut off, do one more iteration picking up where we left off
-					if(j == 30){
-
-						strcat(tRec[i+1], "T");
-                                		char buff[1024];
-                                		snprintf(buff, sizeof(buff), "%06X", atoi("30"));
-						strcat(tRec[i+1], buff);
-						char* text = malloc(1024 * sizeof(char));
-                                        	memset( text, '\0', 1024 * sizeof(char) );
-						while(strlen(text) < 60){
-                                                	if(tokThird[j] == '\0'){
-                                                        break;
-                                                	}
-                                                	snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
-                                                	strcat(text, buff);
-							j++;
-						}
-						textLen = (strlen(text) / 2);
-                                        	snprintf(buff, sizeof(buff), "%02X", textLen);
-                                        	strcat(tRec[i+1], buff);
-                                        	snprintf(buff, sizeof(buff), "%s", text);
-                                        	strcat(tRec[i+1], buff);
-						//printf("Byte C record:\n");
-                                        	//printf("%s\n",tRec[i+1]);
-						i++;
-						continue;
-					}
-					//printf("Byte C location: %X\n", loArr[i]);
-					i++;
-                                	continue;
-				}
-				//simply return the hex value given
-				else if(strcmp(XorC, "X") == 0){
-                                	tokThird = strtok( NULL, "'\r\t\n");
-					snprintf(buff, sizeof(buff), "%02ld", (strlen(tokThird) / 2));
-					strcat(tRec[i], buff);
-					//printf("\n\ntok third is %s\n\n",tokThird);
-					int hex = strtol(tokThird, NULL, 16);
-					snprintf(buff, sizeof(buff), "%02X", hex);
-					strcat(tRec[i], buff);
-					//printf("Byte X record:\n");
-                                        //printf("%s\n",tRec[i]);
-					//printf("Byte X location: %X\n", loArr[i]);
-					i++;
-                                	continue;
-				}
-
-			}//end else if
-			//directive end (e record)
-			else if(strcmp(dirInst, "END") == 0){
-				strcat(eRec, "E");
-				tokThird = strtok( NULL, "'\r\t\n");
-                                char buff[1024];
-				int j = 0;
-				while(SymbolTable[j+1] != NULL){
-					if(strcmp(SymbolTable[j]->Name, tokThird) == 0){
-						break;
-					}
-					j++;
-				}
-				if(SymbolTable[j+1] == NULL){
-                    printError("Label was not found in Symbol Table, ONE");
-					printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
-					fclose(fp);
-					exit(0);
-				}
-                                snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
-                                strcat(eRec, buff);
-				//printf("End record:\n");
-                                //printf("%s\n",eRec);
-				//printf("End location: %X\n", loArr[i]);
-				i++;
-                                continue;
-			}
-			//if instruction (t record)
-			else if(IsAnInstruction(dirInst) == 1){
-
-                //Store third token to oper
-                oper = strtok( NULL, " ,\r\t\n");
-
-                //-------------------------------------------------
-                //---------------T RECORD GENERATION---------------
-                //-------------------------------------------------
-                //Concat 'T' to t record
-                strcat(tRec[i], "T");
-
-                char buff[1024];
-                //Add location address to a buffer, then append buffer to t record
-                snprintf(buff, sizeof(buff), "%06X", loArr[i]);
-                strcat(tRec[i], buff);
-
-                //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-                if(symbolExists(SymbolTable, oper) == 0)
-                {
-                    printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
-                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
-                }
-                else
-                {
-                    printf("\ngenObjAppend\n");
-                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
-                }
-
-                //Error checking
-                if (strcmp(genObjAppend, "-1") == 0){
-                    printError("Label was not found in Symbol Table, TWO");
-                    fclose(fp);
-                    exit(0);
-                }//end if
-                if (strcmp(genObjAppend, "-2") == 0){
-                    printError("nInvalid register");
-                    fclose(fp);
-                    exit(0);
-                }//end if
-
-                //Break generateObjectcode's returned string in two with comma delimiter
-                sizeAppend = strtok(genObjAppend, " ,");
-                objAppend = strtok(genObjAppend, " ,");
-
-                //Append size to T record
-                strcat(tRec[i], sizeAppend);
-
-                //Append object code to T record
-                strcat(tRec[i], objAppend);
-
-
-                //-------------------------------------------------
-                //---------------M RECORD GENERATION---------------
-                //-------------------------------------------------
-				strcat(mRec[i], "M");
-                snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
-                strcat(mRec[i], buff);
-
-                snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
-                strcat(mRec[i], buff);
-
-				i++;
-                continue;
-			}
-			else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
-				//printf("Reserve location: %X\n", loArr[i]);
-                        	i++;
-                        	continue;
-                	}//end else if
-		}//end if
-
-		//if line with no label (t record)
-		//TODO might need to adjust to handle possibility of dirInst being a directive (e.g. RSUB line)
-		else if(((line[1] >= 65 ) && ( line[1] <= 90))){
-
+			//Tokenize the line
+            dirInst = strtok( NULL, " \r\t\n");
+            //TODO remove debug print statements
+            printf("Symbol line, dirInst is: %s\n", dirInst);
+        }
+        else if (line[0] == 9 || line[0] == 32){
             //Tokenize the line
             dirInst = strtok( line, " \r\t\n");
+            //TODO remove debug print statements
+            printf("Non-symbol line, dirInst is: %s\n", dirInst);
+        }
+
+        //directive start (header record)
+        if(strcmp(dirInst, "START") == 0){
+            hRec = strcat(hRec, "H");
+            hRec = strcat(hRec, SymbolTable[0]->Name);
+            char* extraSpace = "      ";
+            hRec = strncat(hRec, extraSpace, (6 - strlen(SymbolTable[0]->Name)));
+            char buff[1024];
+            snprintf(buff, sizeof(buff), "%06X", SymbolTable[0]->Address);
+            hRec = strcat(hRec, buff);
+            snprintf(buff, sizeof(buff), "%06X", proLen);
+            hRec = strcat(hRec, buff);
+            //printf("\n\n%s\n",hRec);
+            //printf("Start location: %X\n", loArr[i]);
+            continue;
+        }//end if
+        //directive word (t record)
+        else if(strcmp(dirInst, "WORD") == 0){
+            strcat(tRec[i], "T");
+            char buff[1024];
+            snprintf(buff, sizeof(buff), "%06X", loArr[i]);
+            strcat(tRec[i], buff);
+            //length of word
+            strcat(tRec[i], "03");
+            tokThird = strtok( NULL, "\r\t\n");
+            int wordNum = atoi(tokThird);
+            snprintf(buff, sizeof(buff), "%06X",wordNum);
+            strcat(tRec[i], buff);
+            //printf("Word record:\n");
+            //printf("%s\n",tRec[i]);
+            //printf("Word location: %X\n", loArr[i]);
+            i++;
+            continue;
+        }//end else if
+        //directive byte (t record)
+        else if(strcmp(dirInst, "BYTE") == 0){
+
+            strcat(tRec[i], "T");
+            char buff[1024];
+            snprintf(buff, sizeof(buff), "%06X", loArr[i]);
+            strcat(tRec[i], buff);
+
+            char* XorC = strtok( NULL, "'\r\t\n");
+            if(strcmp(XorC, "C") == 0){
+                tokThird = strtok( NULL, "'\r\t\n");
+                //printf("\n\n%s\n\n", tokThird);
+                //int stringLen = strlen(tokThird);
+                //snprintf(buff, sizeof(buff), "%02X", stringLen);
+                //strcat(tRec[i], buff);
+                int j = 0;
+                /*while(strlen(tRec[i]) > 69){
+                    snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
+                                            strcat(tRec[i], buff);
+                                            j++;
+                }
+                */
+                char* text = malloc(1024 * sizeof(char));
+                memset( text, '\0', 1024 * sizeof(char) );
+                while(strlen(text) < 60){
+                    if(tokThird[j] == '\0'){
+                        break;
+                    }
+                    snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
+                    strcat(text, buff);
+                    j++;
+                }
+                int textLen = (strlen(text) / 2);
+                snprintf(buff, sizeof(buff), "%02X", textLen);
+                strcat(tRec[i], buff);
+                snprintf(buff, sizeof(buff), "%s", text);
+                strcat(tRec[i], buff);
+                //printf("\n\nj is equal to: %d\n\n",j);
+                //printf("Byte C record:\n");
+                //printf("%s\n",tRec[i]);
+                //if there was a cut off, do one more iteration picking up where we left off
+                if(j == 30){
+
+                    strcat(tRec[i+1], "T");
+                                    char buff[1024];
+                                    snprintf(buff, sizeof(buff), "%06X", atoi("30"));
+                    strcat(tRec[i+1], buff);
+                    char* text = malloc(1024 * sizeof(char));
+                                        memset( text, '\0', 1024 * sizeof(char) );
+                    while(strlen(text) < 60){
+                                                if(tokThird[j] == '\0'){
+                                                    break;
+                                                }
+                                                snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
+                                                strcat(text, buff);
+                        j++;
+                    }
+                    textLen = (strlen(text) / 2);
+                                        snprintf(buff, sizeof(buff), "%02X", textLen);
+                                        strcat(tRec[i+1], buff);
+                                        snprintf(buff, sizeof(buff), "%s", text);
+                                        strcat(tRec[i+1], buff);
+                    //printf("Byte C record:\n");
+                                        //printf("%s\n",tRec[i+1]);
+                    i++;
+                    continue;
+                }
+                //printf("Byte C location: %X\n", loArr[i]);
+                i++;
+                continue;
+            }
+            //simply return the hex value given
+            else if(strcmp(XorC, "X") == 0){
+                tokThird = strtok( NULL, "'\r\t\n");
+                snprintf(buff, sizeof(buff), "%02ld", (strlen(tokThird) / 2));
+                strcat(tRec[i], buff);
+                //printf("\n\ntok third is %s\n\n",tokThird);
+                int hex = strtol(tokThird, NULL, 16);
+                snprintf(buff, sizeof(buff), "%02X", hex);
+                strcat(tRec[i], buff);
+                i++;
+                continue;
+            }
+
+        }//end else if
+        //directive end (e record)
+        else if(strcmp(dirInst, "END") == 0){
+            strcat(eRec, "E");
+            tokThird = strtok( NULL, "'\r\t\n");
+                            char buff[1024];
+            int j = 0;
+            while(SymbolTable[j+1] != NULL){
+                if(strcmp(SymbolTable[j]->Name, tokThird) == 0){
+                    break;
+                }
+                j++;
+            }
+            if(SymbolTable[j+1] == NULL){
+                printError("Label was not found in Symbol Table, ONE");
+                printf("\nERROR:\n\nLabel %s was not found in Symbol Table.\n\nObject file creation stopped\n\n", tokThird);
+                fclose(fp);
+                exit(0);
+            }
+                            snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
+                            strcat(eRec, buff);
+            //printf("End record:\n");
+                            //printf("%s\n",eRec);
+            //printf("End location: %X\n", loArr[i]);
+            i++;
+                            continue;
+        }
+        //BASE does not generate T records, but does flip a boolean that affects future T records
+        else if(strcmp(dirInst, "BASE") == 0){
+            isBase = 1;
+            continue;
+        }
+        //Also doesn't generate T records. Flips boolean back off
+        else if(strcmp(dirInst, "NOBASE") == 0){
+            isBase = 0;
+            continue;
+        }
+        //if instruction (t record)
+        else if(IsAnInstruction(dirInst) == 1){
+
             oper = strtok( NULL, " ,\r\t\n");
 
-			//-------------------------------------------------
-			//---------------T RECORD GENERATION---------------
-			//-------------------------------------------------
+            //-------------------------------------------------
+            //---------------T RECORD GENERATION---------------
+            //-------------------------------------------------
             //Concat 'T' to t record
             strcat(tRec[i], "T");
 
@@ -618,26 +562,33 @@ int main( int argc, char* argv[]){
             strcat(tRec[i], buff);
 
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-                if(symbolExists(SymbolTable, oper) == 0)
-                {
-                    genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
-                }
-                else
-                {
-                    genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
-                }
+            if(symbolExists(SymbolTable, oper) == 0)
+            {
+                printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
+                genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
+            }
+            else
+            {
+                printf("\ngenObjAppend\n");
+                genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
+            }
 
-                //Error checking
-                if (strcmp(genObjAppend, "-1") == 0){
-                    printError("Label was not found in Symbol Table, THREE");
-                    fclose(fp);
-                    exit(0);
-                }//end if
-                if (strcmp(genObjAppend, "-2") == 0){
-                    printf("\nERROR:\n\nInvalid register\n\nObject file creation stopped\n\n");
-                    fclose(fp);
-                    exit(0);
-                }//end if
+            //Error checking
+            if (strcmp(genObjAppend, "-1") == 0){
+                printError("Label was not found in Symbol Table, TWO");
+                fclose(fp);
+                exit(0);
+            }//end if
+            if (strcmp(genObjAppend, "-2") == 0){
+                printError("Invalid register");
+                fclose(fp);
+                exit(0);
+            }//end if
+            if (strcmp(genObjAppend, "-3") == 0){
+                printError("Out of bounds");
+                fclose(fp);
+                exit(0);
+            }//end if
 
             //Break generateObjectcode's returned string in two with comma delimiter
             sizeAppend = strtok(genObjAppend, " ,");
@@ -662,8 +613,13 @@ int main( int argc, char* argv[]){
 
             i++;
             continue;
-
+        }
+        else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
+            //printf("Reserve location: %X\n", loArr[i]);
+            i++;//TODO is this incrementation necessary if no T record is generated?
+            continue;
         }//end else if
+
 	}//end while
 
 

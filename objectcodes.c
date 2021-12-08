@@ -227,7 +227,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
                 }
                 else if(dis > 4095 || dis < -2048)//out of bounds regardless
                 {
-                    return "-1";
+                    return "-3";
                 }
                 else
                 {
@@ -248,7 +248,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
                 }
                 else if(dis > 4095 || dis < -2048)
                 {
-                    return "-1";
+                    return "-3";
                 }
                 else//default is PC relative
                 {
