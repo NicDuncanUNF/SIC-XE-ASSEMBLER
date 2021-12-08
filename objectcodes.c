@@ -1,5 +1,4 @@
 //will be used for generating objectcodes for format 2, 3, and 4 for TRecords
-//ADD BASE INSTRUCTION HANDLING, can be format 3 or 4
 #include "headers.h"
 #include "stdlib.h"
 #include "stdbool.h"
