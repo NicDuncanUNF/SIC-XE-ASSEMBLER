@@ -284,7 +284,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
 	//by some stroke of luck, the value passed is not identified as any valid format
 	else{
 		printf("How did we get here!\n");
-		return -2;
+		return "-2";
 		
 	}//end else
 }//end function
