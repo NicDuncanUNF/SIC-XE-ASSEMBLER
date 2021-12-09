@@ -1,7 +1,5 @@
 //Generates and returns object code for all formats (1-4), which will later be appended to end of T records
 #include "headers.h"
-#include "stdlib.h"
-#include "stdbool.h"
 
 char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue, int base)//function will handle formats 1, 2, 3, and 4 for sic xe
 {
