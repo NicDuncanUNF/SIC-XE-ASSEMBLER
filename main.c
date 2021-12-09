@@ -377,6 +377,7 @@ int main( int argc, char* argv[]){
 
 		//If line is a comment
 		if ( line[0] == 35) {
+			//TODO check if a i++ needs to go here.
 			continue;
 		}//end if
 		//If line contains a symbol
@@ -561,6 +562,7 @@ int main( int argc, char* argv[]){
             }
             snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
             strcat(eRec, buff);
+			//does not need to increment i
             continue;
         }
         //BASE does not generate T records, but does flip a boolean that affects future T records
