@@ -407,6 +407,7 @@ int main( int argc, char* argv[]){
             //printf("\n\n%s\n",hRec);
             //printf("Start location: %X\n", loArr[i]);
             printf("H record created\n");
+			i++;
             continue;
         }//end if
         //directive word (t record)
@@ -583,6 +584,7 @@ int main( int argc, char* argv[]){
 
             char buff[1024];
             //Add location address to a buffer, then append buffer to t record
+			//TODO BUFFER IS CURRENTLY FILLING WITH F'S
             snprintf(buff, sizeof(buff), "%06X", loArr[i]);
             strcat(tRec[i], buff);
 

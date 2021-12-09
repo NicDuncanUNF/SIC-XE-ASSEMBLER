@@ -71,7 +71,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         return finalObjectcode;
     }
 
-    else if(instr[0] == '+') //format 4
+    else if(getInstrMovement(instr) == 4) //format 4
     {
         char *tempObjectcode = malloc(33 * sizeof(char)); //will store the binary
         char *finalObjectcode = malloc(12 * sizeof(char)); //will store final object code
@@ -131,7 +131,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
 
     }//end format 4
 
-    else //format 3
+    else //default to format 3
     {
         char *registers[2];//will store register values
         char *tempObjectcode = malloc(25 * sizeof(char));//will store the binary
