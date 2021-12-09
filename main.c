@@ -301,7 +301,7 @@ int main( int argc, char* argv[]){
 	printf("Symbol Table:\n");
 	int symIndex = 0;
 	while(SymbolTable[symIndex+1] != NULL){
-		printf("%s\t%X\n",SymbolTable[symIndex]->Name,SymbolTable[symIndex]->Address);
+		printf("|%s|\t%X\n",SymbolTable[symIndex]->Name,SymbolTable[symIndex]->Address);
 		symIndex++;
 	}//end while
 
@@ -360,6 +360,8 @@ int main( int argc, char* argv[]){
 	memset( objAppend, '\0', 1024 * sizeof(char) );
 	char* sizeAppend = malloc(1024 * sizeof(char) );
 	memset( sizeAppend, '\0', 1024 * sizeof(char) );
+
+	int commaIndex = 0;
 
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
@@ -588,8 +590,23 @@ int main( int argc, char* argv[]){
             snprintf(buff, sizeof(buff), "%06X", loArr[i]);
             strcat(tRec[i], buff);
 
+
+            commaIndex = 0;
+            while(oper[commaIndex] != '\0')
+            {
+                //if contains a comma
+                if (oper[commaIndex] == 54)
+                    {
+                        oper = strtok( oper, ",");
+                        printf("---------------\n\n\n\n|%s|--------------\n\n\n\n", oper);
+                        break;
+                    }
+                commaIndex++;
+            }
+
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-            
+
+            printf("\n---|%s|---\n", oper);
 			if(symbolExists(SymbolTable, oper) == 0)
             {
 				//catches if the symbol does not exist in the symbol table
