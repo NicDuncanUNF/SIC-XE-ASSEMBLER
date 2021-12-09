@@ -131,7 +131,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
 
     }//end format 4
 
-    else //default to format 3
+    else if(getInstrMovement(instr) == 3) //format 3
     {
         char *registers[2];//will store register values
         char *tempObjectcode = malloc(25 * sizeof(char));//will store the binary
@@ -281,7 +281,13 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
 
         return finalObjectcode;
     }//end of format 3
-}
+	//by some stroke of luck, the value passed is not identified as any valid format
+	else{
+		printf("How did we get here!\n");
+		return -2;
+		
+	}//end else
+}//end function
 
 char * hexToBin(char value) //function converts hex to bin
 {

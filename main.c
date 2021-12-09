@@ -574,7 +574,7 @@ int main( int argc, char* argv[]){
         //if instruction (t record)
         else if(IsAnInstruction(dirInst) == 1){
 
-            oper = strtok( NULL, " ,\r\t\n");
+            oper = strtok( NULL, "\r\t\n");
 
             //-------------------------------------------------
             //---------------T RECORD GENERATION---------------
