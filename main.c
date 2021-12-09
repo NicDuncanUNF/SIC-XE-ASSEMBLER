@@ -230,7 +230,7 @@ int main( int argc, char* argv[]){
             printf("\n\nNON-SYMBOL LINE\n\n");
 			nextoken = strtok( line, " \r\t\n"  );
 			//printf("\nFULL LINE:%s", fullline );
-            //printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
+            printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
 			if(IsADirective(nextoken) == 1){
                 //printf("%s is a valid directive.\n\n", nextoken);
                 //if else branch of directives for location counter movement
@@ -392,7 +392,7 @@ int main( int argc, char* argv[]){
             //Tokenize the line
             dirInst = strtok( line, " \r\t\n");
             //TODO remove debug print statements
-            printf("Non-symbol line, dirInst is: %s\n", dirInst);
+            printf("Non-symbol line, dirInst is: |%s|\n", dirInst);
         }
 
         //directive start (header record)
@@ -649,11 +649,12 @@ int main( int argc, char* argv[]){
 
             //Append object code to T record
             strcat(tRec[i], objAppend);
-
-
-            //-------------------------------------------------
-            //---------------M RECORD GENERATION---------------
-            //-------------------------------------------------
+			
+			//ensure only format 4's get an M record.
+			if(strcmp(objAppend, "04")==0){
+				//-------------------------------------------------
+				//---------------M RECORD GENERATION---------------
+				//-------------------------------------------------
             strcat(mRec[i], "M");
             snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
             strcat(mRec[i], buff);
@@ -663,6 +664,10 @@ int main( int argc, char* argv[]){
 
             i++;
             continue;
+			}//end if
+			i++;
+			continue;
+            
         }
         else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
             //printf("Reserve location: %X\n", loArr[i]);
