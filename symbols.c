@@ -33,8 +33,15 @@ int symbolExists(struct symbol* Tab[], char* sName){
 
 	int result = 0;
 	int index = 0;
-
+	int sSize = strlen(sName);
+	//printf("Last character: %c,%c\n", sName[sSize - 2],sName[sSize - 1]);
+	//perform a quick check to see if an operasnd being passed has a ,X
+	if(sName[sSize - 2] == ',' && sName[sSize - 1] == 'X'){
+		printf("This symbol has a ,X");
+	}//end if
+	
 	while(Tab[index] != NULL){
+		printf("Symbol we are looking for:%s\nSymbol at current table index:%s\n", Tab[index]->Name, sName);
         //If sName matches symbol name at index
         if(strcmp(sName, Tab[index]->Name) == 0){
             result = -1;

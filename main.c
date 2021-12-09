@@ -589,14 +589,17 @@ int main( int argc, char* argv[]){
             strcat(tRec[i], buff);
 
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
-            if(symbolExists(SymbolTable, oper) == 0)
+            
+			if(symbolExists(SymbolTable, oper) == 0)
             {
+				//catches if the symbol does not exist in the symbol table
                 printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                 genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
                 printf("Object code generated: %s\n", genObjAppend);
             }
             else
             {
+				//the symbol does exist in the symbol table.
                 printf("\ngenObjAppend\n");
                 genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
 				printf("Object code generated: %s\n", genObjAppend);
@@ -605,8 +608,7 @@ int main( int argc, char* argv[]){
             //Error checking
             if (strcmp(genObjAppend, "-1") == 0){
                 printError("Label was not found in Symbol Table, ERROR TWO");
-				printf("tokThird:|%s|\n oper:|%s|\n", tokThird, oper);
-                printf("Label:|%s|\n", tokThird);
+				printf("tokThird or label:|%s|\noper:|%s|\n", tokThird, oper);
                 fclose(fp);
                 exit(0);
             }//end if
