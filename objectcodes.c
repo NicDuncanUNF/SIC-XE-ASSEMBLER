@@ -5,8 +5,7 @@
 
 char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCValue, int base)//function will handle formats 1, 2, 3, and 4 for sic xe
 {
-    //char * hexToBin(char value); //will remove
-    //char binToHex(char *bin);//will remove
+    
 
     char buff[1024];
     if(token == NULL) //format 1, where object code = 'OPcode' (e.g. C0)
@@ -133,6 +132,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
 
     else if(getInstrMovement(instr) == 3) //format 3
     {
+		
         char *registers[2];//will store register values
         char *tempObjectcode = malloc(25 * sizeof(char));//will store the binary
         char *finalObjectcode = malloc(10 * sizeof(char)); //will store final object code

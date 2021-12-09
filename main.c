@@ -593,11 +593,13 @@ int main( int argc, char* argv[]){
             {
                 printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                 genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
+				printf("Object code generated: %s\n", genObjAppend);
             }
             else
             {
                 printf("\ngenObjAppend\n");
                 genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
+				printf("Object code generated: %s\n", genObjAppend);
             }
 
             //Error checking
