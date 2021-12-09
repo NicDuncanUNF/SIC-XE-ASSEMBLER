@@ -77,7 +77,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         snprintf(buff, sizeof(buff), "%02X", getOpcode(instr) & 0xff); //gets opcode
         strcpy(tempObjectcode, hexToBin(buff[0]));//converts first hex opcode to binary and stores
 
-        strncat(tempObjectcode, hexToBin(buff[1]), 2); //converts second hex value in opcode to binary and stores
+        strncat(tempObjectcode, hexToBin(buff[1]), 4); //converts second hex value in opcode to binary and stores
          //n and i are 1s for format 4
         strcat(tempObjectcode, "11");
 
@@ -137,7 +137,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
         snprintf(buff, sizeof(buff), "%02X", getOpcode(instr) & 0xff); //gets opcode
 
         strcpy(tempObjectcode, hexToBin(buff[0]));//converts first hex opcode to binary and stores
-        strncat(tempObjectcode, hexToBin(buff[1]), 2); //converts second hex value in opcode to binary and stores
+        strncat(tempObjectcode, hexToBin(buff[1]), 4); //converts second hex value in opcode to binary and stores
 
         //below handles n and i
         if(token[0] == '#')//for immediate addressing
