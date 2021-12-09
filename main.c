@@ -178,8 +178,8 @@ int main( int argc, char* argv[]){
 					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
 						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
-                                                fclose(fp);
-                                                return 0;
+                        fclose(fp);
+                        return 0;
 					}//end if
 
 				}//end else
@@ -593,7 +593,7 @@ int main( int argc, char* argv[]){
             {
                 printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                 genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
-				printf("Object code generated: %s\n", genObjAppend);
+                printf("Object code generated: %s\n", genObjAppend);
             }
             else
             {
@@ -622,7 +622,7 @@ int main( int argc, char* argv[]){
 
             //Break generateObjectcode's returned string in two with comma delimiter
             sizeAppend = strtok(genObjAppend, " ,");
-            objAppend = strtok(genObjAppend, " ,");
+            objAppend = strtok(NULL, " \r\t\n");
 
             //Append size to T record
             strcat(tRec[i], sizeAppend);
