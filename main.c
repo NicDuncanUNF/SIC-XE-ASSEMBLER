@@ -161,7 +161,7 @@ int main( int argc, char* argv[]){
 				//adding symbols after start
 				else{
 					//save loCounter and symbol into new struct
-					thirdToken = strtok(NULL, "\t\n");
+					thirdToken = strtok(NULL, "\r\t\n");
 					//error check 2
 					//printf("\n\n\nelse entered: %s\n\n\n", newsym);
 					if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
@@ -228,7 +228,7 @@ int main( int argc, char* argv[]){
 		//For lines without symbols
 		else if(lineCondition == 2){
             printf("\n\nNON-SYMBOL LINE\n\n");
-			nextoken = strtok( line, " \t\n"  );
+			nextoken = strtok( line, " \r\t\n"  );
 			//printf("\nFULL LINE:%s", fullline );
             //printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
 			if(IsADirective(nextoken) == 1){
@@ -418,7 +418,7 @@ int main( int argc, char* argv[]){
             strcat(tRec[i], buff);
             //length of word
             strcat(tRec[i], "03");
-            tokThird = strtok( NULL, "\r\t\n");
+            tokThird = strtok( NULL, " \r\t\n");
             int wordNum = atoi(tokThird);
             snprintf(buff, sizeof(buff), "%06X",wordNum);
             strcat(tRec[i], buff);
@@ -438,7 +438,7 @@ int main( int argc, char* argv[]){
 
             char* XorC = strtok( NULL, "'\r\t\n");
             if(strcmp(XorC, "C") == 0){
-                tokThird = strtok( NULL, "'\r\t\n");
+                tokThird = strtok( NULL, " '\r\t\n");
                 //printf("\n\n%s\n\n", tokThird);
                 //int stringLen = strlen(tokThird);
                 //snprintf(buff, sizeof(buff), "%02X", stringLen);
@@ -501,7 +501,7 @@ int main( int argc, char* argv[]){
             }
             //simply return the hex value given
             else if(strcmp(XorC, "X") == 0){
-                tokThird = strtok( NULL, "'\r\t\n");
+                tokThird = strtok( NULL, " '\r\t\n");
                 snprintf(buff, sizeof(buff), "%02ld", (strlen(tokThird) / 2));
                 strcat(tRec[i], buff);
                 //printf("\n\ntok third is %s\n\n",tokThird);
@@ -574,7 +574,7 @@ int main( int argc, char* argv[]){
         //if instruction (t record)
         else if(IsAnInstruction(dirInst) == 1){
 
-            oper = strtok( NULL, "\r\t\n");
+            oper = strtok( NULL, " \r\t\n");
 
             //-------------------------------------------------
             //---------------T RECORD GENERATION---------------
@@ -605,7 +605,8 @@ int main( int argc, char* argv[]){
             //Error checking
             if (strcmp(genObjAppend, "-1") == 0){
                 printError("Label was not found in Symbol Table, ERROR TWO");
-                printf("Label: |%s|\n", tokThird);
+				printf("tokThird:|%s|\n oper:|%s|\n", tokThird, oper);
+                printf("Label:|%s|\n", tokThird);
                 fclose(fp);
                 exit(0);
             }//end if
