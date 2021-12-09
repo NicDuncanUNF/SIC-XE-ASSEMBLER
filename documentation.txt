@@ -57,18 +57,3 @@ Format 1, does not generate the correct opcode yet.
 Hits errors when creating object code.
 Overall:
 Clean up git repository of all compiler related and unneeded files and folders.
-Powerpoint presentation.
-
-=====Presenation Notes=====
-language and tools used
-goal of project
-Overview of logic flow and design choices (Storage types, tokens, structures)
-Show documentation (Create man page?)
-Error control methods
-Changes needed in order to process SICXE code
-Things we could have done better/Issues
-Limitations
-Output example
-Lessons learned (Communication, Coordination, Git, )
-Asymptotic Runtime/Efficiency
-Conclusions/Questions
