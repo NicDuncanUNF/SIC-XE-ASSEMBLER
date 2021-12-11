@@ -76,10 +76,10 @@
 1638857672 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\instructions.c
 	"headers.h"
 
-1639036293 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\objectcodes.c
+1639245674 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\objectcodes.c
 	"headers.h"
 
-1639072300 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
+1639073185 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\symbols.c
 	"headers.h"
 
 1639072879 source:d:\documents\github\sic-xe-assembler\sic-xe-assembler\main.c

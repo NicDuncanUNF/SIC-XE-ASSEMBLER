@@ -31,8 +31,8 @@ int main( int argc, char* argv[]){
 	int isBase = 0;
 
 	if ( argc != 2 ) {
-	printf("ERROR: Usage: %s filename\n", argv[0]);
-	return 0;
+        printf("ERROR: Usage: %s filename\n", argv[0]);
+        return 0;
 	}
 
 
@@ -51,9 +51,6 @@ int main( int argc, char* argv[]){
 	memset( thirdToken, '\0', 1024 * sizeof(char)          );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
 
-	//Used in condition code for if-else statements pertaining to what type of line is being read
-	int lineCondition = 0;
-
 	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
@@ -62,10 +59,8 @@ int main( int argc, char* argv[]){
 
         printf("Line: %s", line);
 		strcpy( fullline, line );
-		if ( line[0] == 35) {
-			//printf("COMMENT:%s", line );
-			continue;
-		}
+		if ( line[0] == 35)
+            {continue;}
 
 		//if the line is empty
 		if(line == NULL){
@@ -79,16 +74,9 @@ int main( int argc, char* argv[]){
             fclose(fp);
             return 0;
         }
-        //If line contains a symbol
-        if ((line[0] >= 65 ) && (line[0] <= 90))
-            {lineCondition = 1;}
-        //Line does not contain a symbol
-        if (line[0] == 9 || line[0] == 32)
-            {lineCondition = 2;}
-
 
 		//For lines with symbols
-		if (lineCondition == 1){
+		if ((line[0] >= 65 ) && (line[0] <= 90)){
 			//get the symbol
 			newsym = strtok( line, " \r\t\n");
 
@@ -123,13 +111,12 @@ int main( int argc, char* argv[]){
 					newsym[i] == 41 ||//)
 					newsym[i] == 64 ||//@
 					newsym[i] == 37){//%
-						printf("\nERROR:\n\n%s\nLine %d, Invalid character used in symbol.\n\n", fullline, lineNum);
-                                                fclose(fp);
-                                                return 0;
+						printError("Invalid character used in symbol.\n\n");
+                        fclose(fp);
+                        return 0;
 					}//end if
-					else{
-						continue;
-					}//end else
+					else
+                        {continue;}
 				}//end for
 			}//end else
 
@@ -148,7 +135,7 @@ int main( int argc, char* argv[]){
 					int maxMem = strtol("100000", NULL, 16);
 					//check if the new location counter exceeds max memory value
 					if(strtol(thirdToken, NULL, 16) >= maxMem){
-						printf("\nERROR:\n\n%s\nLine %d, SIC program starts outside of memory.\n\n", fullline, lineNum);
+						printError("SIC program starts outside of memory.");
 						fclose(fp);
 						return 0;
 					}
@@ -165,7 +152,7 @@ int main( int argc, char* argv[]){
 					//error check 2
 					//printf("\n\n\nelse entered: %s\n\n\n", newsym);
 					if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
-						printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
+						printError("Duplicate symbol found.\n\n");
 						fclose(fp);
 						return 0;
 					}
@@ -177,7 +164,7 @@ int main( int argc, char* argv[]){
 					//check if the new location counter exceeds max memory value
 					int maxMem = strtol("100000", NULL, 16);
 					if(loCounter >= maxMem){
-						printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
+						printError("Program exceeded memory.\n\n");
                         fclose(fp);
                         return 0;
 					}//end if
@@ -189,7 +176,7 @@ int main( int argc, char* argv[]){
 				//printf("%s is a valid instruction.\n\n", nextoken);
 				//move location counter by 3 bytes
 				if(symbolExists(SymbolTable, newsym) != 0){ //newsym is just a string at this point
-					printf("\nERROR:\n\n%s\nLine %d, Duplicate symbol found.\n\n", fullline, lineNum);
+					printError("Duplicate symbol found.");
                     fclose(fp);
                     return 0;
                 }//end if
@@ -226,7 +213,7 @@ int main( int argc, char* argv[]){
 			continue;
 		}//end if
 		//For lines without symbols
-		else if(lineCondition == 2){
+		else if(line[0] == 9 || line[0] == 32){
             printf("\n\nNON-SYMBOL LINE\n\n");
 			nextoken = strtok( line, " \r\t\n"  );
 			//printf("\nFULL LINE:%s", fullline );
@@ -241,7 +228,7 @@ int main( int argc, char* argv[]){
                 loEle++;
                 int maxMem = strtol("100000", NULL, 16);
                 if(loCounter >= maxMem){
-                    printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
+                    printError("Program exceeded memory.");
                     fclose(fp);
                     return 0;
                 }//end if
@@ -256,7 +243,7 @@ int main( int argc, char* argv[]){
                 loEle++;
                 int maxMem = strtol("100000", NULL, 16);
                 if(loCounter >= maxMem){
-                    printf("\nERROR:\n\n%s\nLine %d, Program exceeded memory.\n\n", fullline, lineNum);
+                    printError("Program exceeded memory.");
                     fclose(fp);
                     return 0;
                 }
@@ -269,7 +256,7 @@ int main( int argc, char* argv[]){
                     return 0;
                 }//end if =
                 else{
-                    printf("\nERROR. INVALID INSTRUCTION FOUND ON LINE: %d\n\n", lineNum);
+                    printError("INVALID INSTRUCTION FOUND");
                     fclose(fp);
                     return 0;
                 }//end else
@@ -278,7 +265,7 @@ int main( int argc, char* argv[]){
 		}//end else if
 		//if the line is blank, error out
 		else{
-			printf("\nERROR:\n\n%s\nLine %d, Blank line found.\n\n", fullline, lineNum+1);
+			printError("Blank line found.");
 			fclose(fp);
 			return 0;
 		}//end else if
@@ -292,7 +279,7 @@ int main( int argc, char* argv[]){
 	}//end while
 	//error check 25 missing start
 	if(startFound == 0){
-		printf("\nERROR:\n\nProgram missing START directive.\n\n");
+		printError("Program missing START directive.");
 		fclose(fp);
 		return 0;
 	}
@@ -651,7 +638,7 @@ int main( int argc, char* argv[]){
 
             //Append object code to T record
             strcat(tRec[i], objAppend);
-			
+
 			//ensure only format 4's get an M record.
 			if(strcmp(objAppend, "04")==0){
 				//-------------------------------------------------
@@ -669,7 +656,7 @@ int main( int argc, char* argv[]){
 			}//end if
 			i++;
 			continue;
-            
+
         }
         else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
             //printf("Reserve location: %X\n", loArr[i]);
@@ -735,7 +722,7 @@ int main( int argc, char* argv[]){
 
 
 //edit this to feed line and line number into parameters for error messages
-int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[], int lineNumber){
+int updateLocation(char *dirInst, char* tokThird, int currCount, char fullline[], int lineNum){
     //printf("\n\nupdateLocation called\n\n");
 	//if else for directives that move locounter somewhere other than 3 bytes
         //instruction movement calculation based on format
@@ -800,17 +787,17 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 				}
 				//test error check 3
 				else{
-					printf("\nERROR:\n\n%s\nLine %d, Invalid hex constant found.\n\n", fullLine, lineNumber);
+					printError("Invalid hex constant found.");
 					exit(0);
 				}
 			}
 			else{
-				printf("ERROR. INVALID BYTE CONSTANT FOUND. FIRST ERROR\n\n");
+				printError("INVALID BYTE CONSTANT FOUND. FIRST ERROR");
 				exit(0);
 			}
 		}
 		else{
-			printf("ERROR. INVALID BYTE CONSTANT FOUND. SECOND ERROR%s\n\n", XorC);
+			printError("INVALID BYTE CONSTANT FOUND. SECOND ERROR");
 			exit(0);
 		}
 		char* byteCheck = strtok(NULL, " '");
@@ -833,7 +820,7 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullLine[]
 	else if(strcmp(dirInst, "WORD") == 0){
 		//still move loCounter by 3 but implement check for word constant
 		if(atoi(tokThird) > 8388607){ //<-The bit limit
-			printf("\nERROR:\n\n%s\nLine %d, Word constant exceeds 24 bit limit.\n\n", fullLine, lineNumber);
+			printError("Word constant exceeds 24 bit limit.");
 			exit(0);
 		}
 		currCount = currCount + 3;
