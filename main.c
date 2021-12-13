@@ -77,6 +77,11 @@ int main( int argc, char* argv[]){
 
 		//For lines with symbols
 		if ((line[0] >= 65 ) && (line[0] <= 90)){
+
+            /**********************
+            *---HANDLING SYMBOL---*
+            **********************/
+
 			//get the symbol
 			newsym = strtok( line, " \r\t\n");
 
@@ -120,8 +125,12 @@ int main( int argc, char* argv[]){
 				}//end for
 			}//end else
 
+            /*************************
+            *---HANDLING DIRECTIVE---*
+            *************************/
+
 			//Get the instruction/directive from the line
-			nextoken = strtok( NULL, " \t\n"  );
+			nextoken = strtok( NULL, " \t\n\r"  );
 
 			//If the middle token is a directive
 			//TODO investigate if directives have any new changes in SICXE
@@ -197,6 +206,7 @@ int main( int argc, char* argv[]){
 			}//end else if
 			//if none of the above are triggered, the middle token is an invalid directive or instruction.
 			else{
+                printf("Directive: |%s|\n", nextoken);
 				if(IsADirective(nextoken) == 0){
                     printError("INVALID DIRECTIVE FOUND, ERROR ONE");//TODO Fix error code
                     fclose(fp);
@@ -214,16 +224,12 @@ int main( int argc, char* argv[]){
 		}//end if
 		//For lines without symbols
 		else if(line[0] == 9 || line[0] == 32){
-            printf("\n\nNON-SYMBOL LINE\n\n");
 			nextoken = strtok( line, " \r\t\n"  );
-			//printf("\nFULL LINE:%s", fullline );
-            printf("FIRST TOKEN ON LINE IS %s\n", nextoken );
+			thirdToken = strtok( line, " \r\t\n"  );
+            printf("    FIRST TOKEN ON LINE IS %s\n", nextoken );
 			if(IsADirective(nextoken) == 1){
-                //printf("%s is a valid directive.\n\n", nextoken);
                 //if else branch of directives for location counter movement
-                //error check 10
-                //printf("\n\nLINE 211\n\n");
-                loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+                loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
                 loArr[loEle] = loCounter;
                 loEle++;
                 int maxMem = strtol("100000", NULL, 16);
@@ -238,7 +244,7 @@ int main( int argc, char* argv[]){
                 //move location counter by 3bytes
                 //error check 10
                 //printf("\n\nLINE 226\n\n");
-                loCounter = updateLocation(nextoken, NULL, loCounter, fullline, lineNum);
+                loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
                 loArr[loEle] = loCounter;
                 loEle++;
                 int maxMem = strtol("100000", NULL, 16);
@@ -310,9 +316,9 @@ int main( int argc, char* argv[]){
 
 
 /************************************************************************
- *									*
+ *									                                    *
  *------------------------------Pass 2----------------------------------*
- *									*
+ *									                                    *
  ************************************************************************/
 
 	int proLen = (loArr[loEle-1] - loArr[0]);
@@ -347,8 +353,7 @@ int main( int argc, char* argv[]){
 	memset( objAppend, '\0', 1024 * sizeof(char) );
 	char* sizeAppend = malloc(1024 * sizeof(char) );
 	memset( sizeAppend, '\0', 1024 * sizeof(char) );
-
-	int commaIndex = 0;
+	int operAddress = 0;
 
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
 
@@ -358,9 +363,9 @@ int main( int argc, char* argv[]){
         strcpy( fullline, line );
 
         //TODO remove debug print statements
-        printf("Line number: %d\n", lineNum);
+        printf("\n\nLine number: %d\n", lineNum);
         printf("T record number: %d\n", i);
-        printf("Line: %s\n\n", fullline);
+        printf("Line: %s", fullline);
 
 		//If line is a comment
 		if ( line[0] == 35) {
@@ -509,46 +514,32 @@ int main( int argc, char* argv[]){
             printf("Reached END directive, with tokThird |%s|\n", tokThird);
             strcat(eRec, "E");
             printf("After strcat E\n");
+
             char buff[1024];
-            int j = 0;
 
-            while(SymbolTable[j+1] != NULL){
-                if(strcmp(SymbolTable[j]->Name, tokThird) == 0)
-                    {break;}
-                j++;
-            }
+            if(symbolExists(SymbolTable, tokThird) != 0){
+                int j = 0;
 
-            if(SymbolTable[j+1] == NULL){
-                printf("After strcat E\n");
-                char buff[1024];
-                j = 0;
-
-                printf("Before symbol search\n");
-
-                //Search symbol for END's operand, which specifies the first executable instruction
-                //Once found in symbol table,
+                //Find index of symbol
                 while(SymbolTable[j+1] != NULL){
-                    if(strcmp(SymbolTable[j]->Name, tokThird) == 0)
+                    if(strcmp(SymbolTable[j]->Name, oper) == 0)
                         {break;}
                     j++;
                 }
 
-                printf("After symbol search\n");
-
-                if(SymbolTable[j+1] == NULL){
-                    printError("Label was not found in Symbol Table, ERROR ONE");
-                    printf("Label: |%s|\n", tokThird);
-                    fclose(fp);
-                    exit(0);
-                }
-
                 snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
                 strcat(eRec, buff);
-
-                continue;
             }
-            snprintf(buff, sizeof(buff), "%06X", SymbolTable[j]->Address);
-            strcat(eRec, buff);
+            else if(tokThird != NULL){
+                printError("Label was not found in Symbol Table, ERROR ONE\n");
+                printf("Label: |%s|\n", tokThird);
+                fclose(fp);
+                exit(0);
+            }
+            else{
+                printf("END has no operand.");//Note that this is not an error. END w/ no operand is legal (I think)
+            }
+
 			//does not need to increment i
             continue;
         }
@@ -566,6 +557,7 @@ int main( int argc, char* argv[]){
         else if(IsAnInstruction(dirInst) == 1){
 
             oper = strtok( NULL, " \r\t\n");
+            printf("---Operand is |%s|---\n", oper);//TODO remove this
 
             //-------------------------------------------------
             //---------------T RECORD GENERATION---------------
@@ -579,36 +571,29 @@ int main( int argc, char* argv[]){
             snprintf(buff, sizeof(buff), "%06X", loArr[i]);
             strcat(tRec[i], buff);
 
-
-            commaIndex = 0;
-            while(oper[commaIndex] != '\0')
-            {
-                //if contains a comma
-                if (oper[commaIndex] == 54)
-                    {
-                        oper = strtok( oper, ",");
-                        printf("---------------\n\n\n\n|%s|--------------\n\n\n\n", oper);
-                        break;
-                    }
-                commaIndex++;
-            }
-
             //Calls function that returns object code and size of instruction, formatted as 'objectcode,size'
 
-            printf("\n---|%s|---\n", oper);
-			if(symbolExists(SymbolTable, oper) == 0)
-            {
-				//catches if the symbol does not exist in the symbol table
+            //If symbol exists
+            if((oper != NULL) && (symbolExists(SymbolTable, oper) != 0)){
+                int j = 0;
+
+                //Find index of symbol
+                while(SymbolTable[j+1] != NULL){
+                    if(strcmp(SymbolTable[j]->Name, oper) == 0)
+                        {break;}
+                    j++;
+                }
+
+                //Get symbol's address
+                operAddress = SymbolTable[j]->Address;
+                genObjAppend = generateObjectcode(dirInst, oper, operAddress, (loArr[i+1]), isBase);
+				printf("Object code generated: %s\n", genObjAppend);
+            }
+            else{
+                //catches if the symbol does not exist in the symbol table
                 printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                 genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
                 printf("Object code generated: %s\n", genObjAppend);
-            }
-            else
-            {
-				//the symbol does exist in the symbol table.
-                printf("\ngenObjAppend\n");
-                genObjAppend = generateObjectcode(dirInst, oper, loArr[i], (loArr[i+1]), isBase);
-				printf("Object code generated: %s\n", genObjAppend);
             }
 
             //Error checking
@@ -725,34 +710,30 @@ int main( int argc, char* argv[]){
 int updateLocation(char *dirInst, char* tokThird, int currCount, char fullline[], int lineNum){
     //printf("\n\nupdateLocation called\n\n");
 	//if else for directives that move locounter somewhere other than 3 bytes
-        //instruction movement calculation based on format
-        //printf("\n\nCalling IsAnInstruction from updateLocation, with instruction |%s|\n\n", dirInst);
-		if(IsAnInstruction(dirInst) != 0){
-                //different formats move their respective number in bytes
+    //instruction movement calculation based on format
+    //printf("\n\nCalling IsAnInstruction from updateLocation, with instruction |%s|\n\n", dirInst);
+    if(IsAnInstruction(dirInst) != 0){
+        //different formats move their respective number in bytes
 
-				//if format 4
-				if(getInstrMovement(dirInst) == 4){
-					return (currCount + 4);
-				}//end if
-				//if format 3
-				else if(getInstrMovement(dirInst) == 3){
-					return (currCount + 3);
-				}//end if
-				//if format 2
-				else if(getInstrMovement(dirInst) == 2){
-					return (currCount + 2);
-				}//end if
-				//if format 1
-				else if(getInstrMovement(dirInst) == 1){
-					return (currCount + 1);
-				}//end if
-
-				else{
-
-				}//end if
-
-                return currCount;
+        //if format 4
+        if(getInstrMovement(dirInst) == 4){
+            return (currCount + 4);
         }//end if
+        //if format 3
+        else if(getInstrMovement(dirInst) == 3){
+            return (currCount + 3);
+        }//end if
+        //if format 2
+        else if(getInstrMovement(dirInst) == 2){
+            return (currCount + 2);
+        }//end if
+        //if format 1
+        else if(getInstrMovement(dirInst) == 1){
+            return (currCount + 1);
+        }//end if
+
+        return currCount;
+    }//end if
 	else if(strcmp(dirInst, "BYTE") == 0){
 		//parse string for c string(move loCounter stringlength) for x(move loCounter 1 for each pair)
 		//5,4,2,10 easiest checks according to fred
@@ -831,35 +812,7 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullline[]
 		currCount = currCount + 3;
 		return currCount;
 	}
-
 }
-
-int IsAnInstruction(char* Instr){
-	if(
-        strcmp( Instr, "ADD") == 0   || strcmp( Instr, "ADDF") == 0  || strcmp( Instr, "AND") == 0  || strcmp( Instr, "COMP") == 0 ||
-        strcmp( Instr, "COMPF") == 0 || strcmp( Instr, "DIV") == 0   || strcmp( Instr, "DIVF") == 0 || strcmp( Instr, "J") == 0    ||
-        strcmp( Instr, "JEQ") == 0   || strcmp( Instr, "JGT") == 0   || strcmp( Instr, "JLT") == 0  || strcmp( Instr, "JSUB") == 0 ||
-        strcmp( Instr, "LDA") == 0   || strcmp( Instr, "LDB") == 0   || strcmp( Instr, "LDCH") == 0 || strcmp( Instr, "LDF") == 0  ||
-        strcmp( Instr, "LDL") == 0   || strcmp( Instr, "LDS") == 0   || strcmp( Instr, "LDT") == 0  || strcmp( Instr, "LDX") == 0  ||
-        strcmp( Instr, "LPS") == 0   || strcmp( Instr, "MUL") == 0   || strcmp( Instr, "MULF") == 0 || strcmp( Instr, "OR") == 0   ||
-        strcmp( Instr, "RD") == 0    || strcmp( Instr, "RSUB") == 0  || strcmp( Instr, "SSK") == 0  || strcmp( Instr, "STA") == 0  ||
-        strcmp( Instr, "STB") == 0   || strcmp( Instr, "STCH") == 0  || strcmp( Instr, "STF") == 0  || strcmp( Instr, "STI") == 0  ||
-        strcmp( Instr, "STL") == 0   || strcmp( Instr, "STS") == 0   || strcmp( Instr, "STSW") == 0 || strcmp( Instr, "STT") == 0  ||
-        strcmp( Instr, "STX") == 0   || strcmp( Instr, "SUB") == 0   || strcmp( Instr, "SUBF") == 0 || strcmp( Instr, "TD") == 0   ||
-        strcmp( Instr, "TIX") == 0   || strcmp( Instr, "WD") == 0    || strcmp( Instr, "ADDR") == 0 || strcmp( Instr, "CLEAR") == 0||
-        strcmp( Instr, "COMPR") == 0 || strcmp( Instr, "DIVR") == 0  || strcmp( Instr, "MULR") == 0 || strcmp( Instr, "RMO") == 0  ||
-        strcmp( Instr, "SHIFTL") == 0|| strcmp( Instr, "SHIFTR") == 0|| strcmp( Instr, "SUBR") == 0 || strcmp( Instr, "SVC") == 0  ||
-        strcmp( Instr, "TIXR") == 0  || strcmp( Instr, "FIX") == 0   || strcmp( Instr, "FLOAT") == 0|| strcmp( Instr, "HIO") == 0  ||
-        strcmp( Instr, "NORM") == 0  || strcmp( Instr, "SIO") == 0   || strcmp( Instr, "TIO") == 0
-    ){
-        return 1;
-    }//end if
-	//else
-	else{
-		return 0;
-	}//end else
-
-}//end function
 
 //removes the addressing identifier from a provided instruction or operand
 //key symbols are:
