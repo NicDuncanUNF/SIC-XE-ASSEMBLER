@@ -6,6 +6,7 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
     
 
     char buff[1024];
+    char disbuff[1024];
     if(token == NULL) //format 1, where object code = 'OPcode' (e.g. C0)
     {
         char *finalObjectcode = malloc(6 * sizeof(char)); //will store final object code
