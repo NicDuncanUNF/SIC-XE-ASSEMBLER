@@ -153,25 +153,26 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
             strcat(tempObjectcode, "11");
         }
         //below handles x
+        int xCheck = 0;
+
         for(int i = 0; i < strlen(token); i++)
         {
             if(token[i] == ',')
             {
-                 registers[0] = strtok(token, " ,\r\t\n"); //register 1
-                 registers[1] = strtok(NULL, " ,\r\t\n"); //register 2
+                 registers[0] = strtok(token, ",\r\t\n"); //register 1
+                 registers[1] = strtok(NULL, ",\r\t\n"); //register 2
                  if(strcmp(registers[1], "X") == 0)
                  {
-                     strcat(tempObjectcode, "1"); //x is 1
+			xCheck = 1;
+                     	strcat(tempObjectcode, "1"); //x is 1
+                        break;
                  }
             }
         }
-        if(registers[0] == NULL)
+        if(xCheck == 0)
         {
             strcat(tempObjectcode, "0"); //x is 0
         }
-
-        //below handles b and p as well
-        //strcat(tempObjectcode, "0"); //b is 0 for format 3 and is used with base register FACT CHECK
 
 
         //gets the displacement
@@ -253,13 +254,76 @@ char * generateObjectcode(char *instr, char *token, int operandAdd, int nextPCVa
             //below handles e
             strcat(tempObjectcode, "0");
 
+	    if(dis < 0)//if displacement was a neg value
+	    {
+		    int tempBin;
+        	    char *currentValue = malloc(2 * sizeof(char));
+        	    char *finalDis = malloc(9 * sizeof(char));
+        	    int posValue = abs(dis);//converts negative to postive
+        	    for(int i = 0; posValue > 0; i++)//converts to binary
+        	    {
+                    	tempBin = posValue % 2;
+                	snprintf(disbuff, sizeof(disbuff), "%d", tempBin);
+                	strcat(finalDis, disbuff);
+                	posValue = posValue / 2;
+        	    }
+        	    for(int i = 0; i < strlen(finalDis); i++)//flips the value of the binary
+        	    {
+                    	if(finalDis[i] == '0')
+			{
+                        	finalDis[i] = '1';
+                	}
+			else if(finalDis[i] == '1')
+                	{
+                        	finalDis[i] = '0';
+                	}
+                	else
+                	{
+                        	return "-1";
+                	}
+        	    }//end of bit flipping
+        	    int  carryOver = 1;//we are adding 1
+        	    int tempConvert = 0;
+        	    int finalConvert;
+        	    for(int i = strlen(finalDis) - 1; i >= 0; i--)//adds 1 and then calculates new binary accordingly
+        	    {
+                	currentValue[0] = finalDis[i];
+                	sscanf(currentValue, "%d", &tempConvert);
+			finalConvert = tempConvert + carryOver;
+                	if(finalConvert > 1)
+                	{
+                        	finalDis[i] = '0';
+                        	carryOver = 1;
+                	}
+                	else
+                	{
+                		snprintf(disbuff, sizeof(disbuff), "%d", finalConvert);
+                		finalDis[i] = disbuff[0];
+                		carryOver = 0;
+                	}
+        	    }
+		    
+		    if(strlen(finalDis) < 4)//pads with zeros to prepare for objectcode
+		    {
+        		int difference = 4 - strlen(finalDis);
+        		for(int i = 0; i < difference; i++)
+        		{
+        			strcat(tempObjectcode, "0");
+        		}
 
+		    }
+		    strcat(tempObjectcode, finalDis);
+
+	}
+	else
+	{
             snprintf(buff, sizeof(buff), "%02X", dis); //stores as hex
             for(int i = 0; i < strlen(buff); i++) //goes through every number and gets binary, bin is stored in tempObjectcode
             {
 
                 strcat(tempObjectcode, hexToBin(buff[i]));//converts first hex opcode to binary and stores
             }
+	}
         }
 
 
