@@ -42,7 +42,13 @@ int main( int argc, char* argv[]){
 	printf("ERROR: %s could not be opened for reading,\n", argv[1] );
 	return 0;
 	}
-
+	
+	//ensure the file format is correct. We will only run .sic files. i.e. FILENAME.sic
+	/*printf("File name: %s\n", argv[1]);
+	char* fileNm = "";
+	fileNm = argv[1];
+	printf("Copied File name: %s\n", fileNm);
+	*/
 	char* newsym = malloc(  1024 * sizeof(char)            ); //allocating space
 	memset( newsym, '\0', 1024 * sizeof(char)              ); //zeroing it out
 	char* nextoken = malloc(  1024 * sizeof(char)          );
@@ -50,6 +56,10 @@ int main( int argc, char* argv[]){
 	char* thirdToken = malloc(  1024 * sizeof(char)        );
 	memset( thirdToken, '\0', 1024 * sizeof(char)          );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
+	
+	
+	
+	
 
 	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
@@ -617,6 +627,7 @@ int main( int argc, char* argv[]){
             //Break generateObjectcode's returned string in two with comma delimiter
             sizeAppend = strtok(genObjAppend, " ,");
             objAppend = strtok(NULL, " \r\t\n");
+			printf("Returned Object code: %s, Instruction size: %s\n", sizeAppend, objAppend);
 
             //Append size to T record
             strcat(tRec[i], sizeAppend);
