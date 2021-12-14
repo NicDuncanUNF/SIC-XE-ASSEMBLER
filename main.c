@@ -42,7 +42,7 @@ int main( int argc, char* argv[]){
 	printf("ERROR: %s could not be opened for reading,\n", argv[1] );
 	return 0;
 	}
-	
+
 	//ensure the file format is correct. We will only run .sic files. i.e. FILENAME.sic
 	/*printf("File name: %s\n", argv[1]);
 	char* fileNm = "";
@@ -56,10 +56,10 @@ int main( int argc, char* argv[]){
 	char* thirdToken = malloc(  1024 * sizeof(char)        );
 	memset( thirdToken, '\0', 1024 * sizeof(char)          );
 	memset(SymbolTable, '\0', 1024 * sizeof(struct symbol*));
-	
-	
-	
-	
+
+
+
+
 
 	//Beginning of Pass 1
 	while(  fgets( line , 1024 , fp ) != NULL   ) {
@@ -67,7 +67,7 @@ int main( int argc, char* argv[]){
         //Increment the counter for current line being read
         lineNum++;
 
-        printf("Line: %s", line);
+        //printf("Line: %s", line);
 		strcpy( fullline, line );
 		if ( line[0] == 35)
             {continue;}
@@ -216,7 +216,7 @@ int main( int argc, char* argv[]){
 			}//end else if
 			//if none of the above are triggered, the middle token is an invalid directive or instruction.
 			else{
-                printf("Directive: |%s|\n", nextoken);
+                //printf("Directive: |%s|\n", nextoken);
 				if(IsADirective(nextoken) == 0){
                     printError("INVALID DIRECTIVE FOUND, ERROR ONE");//TODO Fix error code
                     fclose(fp);
@@ -236,7 +236,7 @@ int main( int argc, char* argv[]){
 		else if(line[0] == 9 || line[0] == 32){
 			nextoken = strtok( line, " \r\t\n"  );
 			thirdToken = strtok( line, " \r\t\n"  );
-            printf("    FIRST TOKEN ON LINE IS %s\n", nextoken );
+            //printf("    FIRST TOKEN ON LINE IS %s\n", nextoken );
 			if(IsADirective(nextoken) == 1){
                 //if else branch of directives for location counter movement
                 loCounter = updateLocation(nextoken, thirdToken, loCounter, fullline, lineNum);
@@ -266,7 +266,7 @@ int main( int argc, char* argv[]){
             }//end else if
             else{
                 if(IsADirective(nextoken) == 0){
-                    printf("|%s|\n",nextoken);
+                    //printf("|%s|\n",nextoken);
                     printError("INVALID DIRECTIVE FOUND, ERROR TWO");//TODO FIX ERROR CODE
                     fclose(fp);
                     return 0;
@@ -287,7 +287,7 @@ int main( int argc, char* argv[]){
 		}//end else if
 
 
-		printf("\n-----\nPASS 1 DONE\n-----\n");
+		//printf("\n-----\nPASS 1 DONE\n-----\n");
 
 		//printf("%s", line );
 
@@ -301,12 +301,12 @@ int main( int argc, char* argv[]){
 	}
 
 	//print symbol table
-	printf("Symbol Table:\n");
-	int symIndex = 0;
-	while(SymbolTable[symIndex+1] != NULL){
-		printf("|%s|\t%X\n",SymbolTable[symIndex]->Name,SymbolTable[symIndex]->Address);
-		symIndex++;
-	}//end while
+//	printf("Symbol Table:\n");
+//	int symIndex = 0;
+//	while(SymbolTable[symIndex+1] != NULL){
+//		printf("|%s|\t%X\n",SymbolTable[symIndex]->Name,SymbolTable[symIndex]->Address);
+//		symIndex++;
+//	}//end while
 
 		//--------set up location counter with valid increments
 		//--------create symbol array (learn about type def struct)
@@ -373,9 +373,9 @@ int main( int argc, char* argv[]){
         strcpy( fullline, line );
 
         //TODO remove debug print statements
-        printf("\n\nLine number: %d\n", lineNum);
-        printf("T record number: %d\n", i);
-        printf("Line: %s", fullline);
+        //printf("\n\nLine number: %d\n", lineNum);
+        //printf("T record number: %d\n", i);
+        //printf("Line: %s", fullline);
 
 		//If line is a comment
 		if ( line[0] == 35) {
@@ -389,13 +389,13 @@ int main( int argc, char* argv[]){
 			//Tokenize the line
             dirInst = strtok( NULL, " \r\t\n");
             //TODO remove debug print statements
-            printf("Symbol line, dirInst is: %s\n", dirInst);
+            //printf("Symbol line, dirInst is: %s\n", dirInst);
         }
         else if (line[0] == 9 || line[0] == 32){
             //Tokenize the line
             dirInst = strtok( line, " \r\t\n");
             //TODO remove debug print statements
-            printf("Non-symbol line, dirInst is: |%s|\n", dirInst);
+            //printf("Non-symbol line, dirInst is: |%s|\n", dirInst);
         }
 
         //directive start (header record)
@@ -411,8 +411,8 @@ int main( int argc, char* argv[]){
             hRec = strcat(hRec, buff);
             //printf("\n\n%s\n",hRec);
             //printf("Start location: %X\n", loArr[i]);
-            printf("H record created\n");
-			i++;
+            //printf("H record created\n");
+			//i++;
             continue;
         }//end if
         //directive word (t record)
@@ -427,6 +427,7 @@ int main( int argc, char* argv[]){
             int wordNum = atoi(tokThird);
             snprintf(buff, sizeof(buff), "%06X",wordNum);
             strcat(tRec[i], buff);
+            //printf("T record: %s\n", tRec[i]);
             //printf("Word record:\n");
             //printf("%s\n",tRec[i]);
             //printf("Word location: %X\n", loArr[i]);
@@ -441,20 +442,13 @@ int main( int argc, char* argv[]){
             snprintf(buff, sizeof(buff), "%06X", loArr[i]);
             strcat(tRec[i], buff);
 
-            char* XorC = strtok( NULL, "'\r\t\n");
+            char* XorC = strtok( NULL, " '\r\t\n");
             if(strcmp(XorC, "C") == 0){
-                tokThird = strtok( NULL, " '\r\t\n");
-                //printf("\n\n%s\n\n", tokThird);
-                //int stringLen = strlen(tokThird);
-                //snprintf(buff, sizeof(buff), "%02X", stringLen);
-                //strcat(tRec[i], buff);
+                tokThird = strtok( NULL, "'");
+                //printf("C-String: |%s|\n", tokThird);
+
                 int j = 0;
-                /*while(strlen(tRec[i]) > 69){
-                    snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
-                                            strcat(tRec[i], buff);
-                                            j++;
-                }
-                */
+
                 char* text = malloc(1024 * sizeof(char));
                 memset( text, '\0', 1024 * sizeof(char) );
                 while(strlen(text) < 60){
@@ -470,37 +464,43 @@ int main( int argc, char* argv[]){
                 strcat(tRec[i], buff);
                 snprintf(buff, sizeof(buff), "%s", text);
                 strcat(tRec[i], buff);
-                //printf("\n\nj is equal to: %d\n\n",j);
-                //printf("Byte C record:\n");
-                //printf("%s\n",tRec[i]);
+
                 //if there was a cut off, do one more iteration picking up where we left off
                 if(j == 30){
-
                     strcat(tRec[i+1], "T");
-                                    char buff[1024];
-                                    snprintf(buff, sizeof(buff), "%06X", atoi("30"));
+
+                    char buff[1024];
+                    snprintf(buff, sizeof(buff), "%06X", atoi("30"));
                     strcat(tRec[i+1], buff);
+
                     char* text = malloc(1024 * sizeof(char));
-                                        memset( text, '\0', 1024 * sizeof(char) );
+                    memset( text, '\0', 1024 * sizeof(char) );
+
                     while(strlen(text) < 60){
-                                                if(tokThird[j] == '\0'){
-                                                    break;
-                                                }
-                                                snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
-                                                strcat(text, buff);
+
+                        if(tokThird[j] == '\0'){
+                            break;
+                        }
+
+                        snprintf(buff, sizeof(buff), "%02X", tokThird[j]);
+                        strcat(text, buff);
+
                         j++;
                     }
+
                     textLen = (strlen(text) / 2);
-                                        snprintf(buff, sizeof(buff), "%02X", textLen);
-                                        strcat(tRec[i+1], buff);
-                                        snprintf(buff, sizeof(buff), "%s", text);
-                                        strcat(tRec[i+1], buff);
-                    //printf("Byte C record:\n");
-                                        //printf("%s\n",tRec[i+1]);
+                    snprintf(buff, sizeof(buff), "%02X", textLen);
+                    strcat(tRec[i+1], buff);
+
+                    snprintf(buff, sizeof(buff), "%s", text);
+                    strcat(tRec[i+1], buff);
+
+                    //printf("T record: %s\n", tRec[i]);
                     i++;
                     continue;
                 }
-                //printf("Byte C location: %X\n", loArr[i]);
+
+                //printf("T record: %s\n", tRec[i]);
                 i++;
                 continue;
             }
@@ -509,21 +509,26 @@ int main( int argc, char* argv[]){
                 tokThird = strtok( NULL, " '\r\t\n");
                 snprintf(buff, sizeof(buff), "%02ld", (strlen(tokThird) / 2));
                 strcat(tRec[i], buff);
-                //printf("\n\ntok third is %s\n\n",tokThird);
+
                 int hex = strtol(tokThird, NULL, 16);
                 snprintf(buff, sizeof(buff), "%02X", hex);
                 strcat(tRec[i], buff);
+
+                //printf("T record: %s\n", tRec[i]);
                 i++;
                 continue;
+            }
+            else{
+                printError("Invalid BYTE operand");
             }
 
         }//end else if
         //directive end (e record)
         else if(strcmp(dirInst, "END") == 0){
             tokThird = strtok( NULL, " ,'\r\t\n");
-            printf("Reached END directive, with tokThird |%s|\n", tokThird);
+            //printf("Reached END directive, with tokThird |%s|\n", tokThird);
             strcat(eRec, "E");
-            printf("After strcat E\n");
+            //printf("After strcat E\n");
 
             char buff[1024];
 
@@ -542,12 +547,12 @@ int main( int argc, char* argv[]){
             }
             else if(tokThird != NULL){
                 printError("Label was not found in Symbol Table, ERROR ONE\n");
-                printf("Label: |%s|\n", tokThird);
+                //printf("Label: |%s|\n", tokThird);
                 fclose(fp);
                 exit(0);
             }
             else{
-                printf("END has no operand.");//Note that this is not an error. END w/ no operand is legal (I think)
+                //printf("END has no operand.");//Note that this is not an error. END w/ no operand is legal (I think)
             }
 
 			//does not need to increment i
@@ -567,7 +572,7 @@ int main( int argc, char* argv[]){
         else if(IsAnInstruction(dirInst) == 1){
 
             oper = strtok( NULL, " \r\t\n");
-            printf("---Operand is |%s|---\n", oper);//TODO remove this
+            //printf("---Operand is |%s|---\n", oper);//TODO remove this
 
             //-------------------------------------------------
             //---------------T RECORD GENERATION---------------
@@ -597,19 +602,19 @@ int main( int argc, char* argv[]){
                 //Get symbol's address
                 operAddress = SymbolTable[j]->Address;
                 genObjAppend = generateObjectcode(dirInst, oper, operAddress, (loArr[i+1]), isBase);
-				printf("Object code generated: %s\n", genObjAppend);
+				//printf("Object code generated: %s\n", genObjAppend);
             }
             else{
                 //catches if the symbol does not exist in the symbol table
-                printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
+                //printf("\ngenObjAppend Symbol |%s| Not Found\n", oper);
                 genObjAppend = generateObjectcode(dirInst, oper, -1, (loArr[i+1]), isBase);
-                printf("Object code generated: %s\n", genObjAppend);
+                //printf("Object code generated: %s\n", genObjAppend);
             }
 
             //Error checking
             if (strcmp(genObjAppend, "-1") == 0){
                 printError("Label was not found in Symbol Table, ERROR TWO");
-				printf("tokThird or label:|%s|\noper:|%s|\n", tokThird, oper);
+				//printf("tokThird or label:|%s|\noper:|%s|\n", tokThird, oper);
                 fclose(fp);
                 exit(0);
             }//end if
@@ -625,9 +630,8 @@ int main( int argc, char* argv[]){
             }//end if
 
             //Break generateObjectcode's returned string in two with comma delimiter
-            sizeAppend = strtok(genObjAppend, " ,");
-            objAppend = strtok(NULL, " \r\t\n");
-			printf("Returned Object code: %s, Instruction size: %s\n", sizeAppend, objAppend);
+            objAppend = strtok(genObjAppend, " ,");
+            sizeAppend = strtok(NULL, " \r\t\n");
 
             //Append size to T record
             strcat(tRec[i], sizeAppend);
@@ -635,28 +639,32 @@ int main( int argc, char* argv[]){
             //Append object code to T record
             strcat(tRec[i], objAppend);
 
+            //printf("T record: %s\n", tRec[i]);
+
+
+            //-------------------------------------------------
+            //---------------M RECORD GENERATION---------------
+            //-------------------------------------------------
+
+
 			//ensure only format 4's get an M record.
-			if(strcmp(objAppend, "04")==0){
-				//-------------------------------------------------
-				//---------------M RECORD GENERATION---------------
-				//-------------------------------------------------
-            strcat(mRec[i], "M");
-            snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
-            strcat(mRec[i], buff);
+			if(strcmp(sizeAppend, "04")==0){
+                strcat(mRec[i], "M");
+                snprintf(buff, sizeof(buff), "%06X", loArr[i] + 1);
+                strcat(mRec[i], buff);
 
-            snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
-            strcat(mRec[i], buff);
+                snprintf(buff, sizeof(buff), "05+%s", SymbolTable[0]->Name);
+                strcat(mRec[i], buff);
 
-            i++;
-            continue;
+                i++;
+                continue;
 			}//end if
+
 			i++;
 			continue;
-
         }
         else if(strcmp(dirInst, "RESW") == 0 || strcmp(dirInst, "RESB") == 0){
-            //printf("Reserve location: %X\n", loArr[i]);
-            i++;//TODO is this incrementation necessary if no T record is generated?
+
             continue;
         }//end else if
 
@@ -709,7 +717,7 @@ int main( int argc, char* argv[]){
         //Print e record
         fprintf(fp, "%s\n",eRec);
 
-        printf("\nOBJECT FILE CREATED!\n");
+        //printf("\nOBJECT FILE CREATED!\n");
         //close file
         fclose( fp );
 
@@ -793,7 +801,7 @@ int updateLocation(char *dirInst, char* tokThird, int currCount, char fullline[]
 			exit(0);
 		}
 		char* byteCheck = strtok(NULL, " '");
-		printf("\n\nHERE\n%s\n\n%d\n\n", byteCheck, (int)strlen(byteCheck));
+		//printf("\n\nHERE\n%s\n\n%d\n\n", byteCheck, (int)strlen(byteCheck));
 		//only works for small byte constant. Should fail test 6 as of right now.
 		currCount = currCount + (int)strlen(byteCheck);
 		return currCount;
